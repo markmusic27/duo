@@ -5,14 +5,14 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	process "github.com/markmusic27/workspace/utils"
 )
 
 func InboundHTTPRequest(c *gin.Context) {
-
+	//TODO: Build out HTTP version of the API
 }
 
 func InboundSMSRequest(c *gin.Context) {
-
 	// Checks if the inbound request should be processed
 	authenticatedDevices := strings.Split(os.Getenv("PHONES"), ",")
 	var authenticated = false
@@ -35,4 +35,5 @@ func InboundSMSRequest(c *gin.Context) {
 		"status": "Message is being processed!",
 	})
 
+	process.Process(c.PostForm("Body"))
 }

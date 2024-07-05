@@ -28,7 +28,7 @@ func main() {
 		})
 	})
 
-	api.GET("/sms", handlers.InboundSMSRequest)
+	api.POST("/sms", handlers.InboundSMSRequest)
 	api.POST("/api", handlers.InboundHTTPRequest)
 
 	log.Println("Starting server on port " + port)
