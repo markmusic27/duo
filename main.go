@@ -3,9 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/markmusic27/workspace/handlers"
+	process "github.com/markmusic27/workspace/utils"
 )
 
 func main() {
@@ -17,20 +16,22 @@ func main() {
 		return
 	}
 
-	// Setup API
-	api := gin.Default()
+	process.Process("hello world")
 
-	const port = "8080"
+	// // Setup API
+	// api := gin.Default()
 
-	api.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
+	// const port = "8080"
 
-	api.POST("/sms", handlers.InboundSMSRequest)
-	api.POST("/api", handlers.InboundHTTPRequest)
+	// api.GET("/ping", func(c *gin.Context) {
+	// 	c.JSON(200, gin.H{
+	// 		"message": "pong",
+	// 	})
+	// })
 
-	log.Println("Starting server on port " + port)
-	api.Run(":" + port)
+	// api.POST("/sms", handlers.InboundSMSRequest)
+	// api.POST("/api", handlers.InboundHTTPRequest)
+
+	// log.Println("Starting server on port " + port)
+	// api.Run(":" + port)
 }

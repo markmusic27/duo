@@ -9,7 +9,7 @@ import (
 )
 
 func InboundHTTPRequest(c *gin.Context) {
-	//TODO: Build out HTTP version of the API
+	//TODO: Replace the logic with the HTTP logic
 }
 
 func InboundSMSRequest(c *gin.Context) {
