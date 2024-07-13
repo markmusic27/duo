@@ -13,6 +13,7 @@ import (
 // ⬇️ Notion Endpoints
 
 const NotionDatabaseQueryEndpoint = "https://api.notion.com/v1/databases/*ID*/query"
+const NotionPageCreationEndpoint = "https://api.notion.com/v1/pages"
 
 // ⬇️ Database Query Body
 type DatabaseQueryBody struct {
@@ -38,6 +39,22 @@ type EmailProp struct {
 	Email string `json:"email"`
 }
 
+type SelectProp struct {
+	Name string `json:"name"`
+}
+
+type DateProp struct {
+	Start string `json:"start"`
+}
+
+type RelationProp struct {
+	Pages []RelationPage `json:"relation"`
+}
+
+type RelationPage struct {
+	ID string `json:"id"`
+}
+
 type WebsiteProp struct {
 	URL string `json:"url"`
 }
@@ -52,6 +69,23 @@ type Token struct {
 
 type NameProp struct {
 	Title []Token `json:"title"`
+}
+
+type Icon struct {
+	Type  string `json:"type"`
+	Emoji string `json:"emoji"`
+}
+
+type NameWriteProp struct {
+	Title []TokenWrite `json:"title"`
+}
+
+type TokenWrite struct {
+	Text TextWrite `json:"text"`
+}
+
+type TextWrite struct {
+	Content string `json:"content"`
 }
 
 // ⬇️ Course
@@ -182,4 +216,25 @@ func FetchProjects(filter *Filter) ([]Project, error) {
 	}
 
 	return response.Projects, nil
+}
+
+// ⬇️ Tasks
+
+type Task struct {
+	Parent     ParentDatabase `json:"parent"`
+	Icon       Icon           `json:"icon"`
+	Properties TaskProperties `json:"properties"`
+}
+
+type ParentDatabase struct {
+	Type       string `json:"type"`
+	DatabaseID string `json:"database_id"`
+}
+
+type TaskProperties struct {
+	Name     NameWriteProp `json:"Name"`
+	Priority SelectProp    `json:"Priority"`
+	DueDate  DateProp      `json:"Due Date"`
+	Course   RelationProp  `json:"Course"`
+	Project  RelationProp  `json:"Project"`
 }

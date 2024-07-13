@@ -51,13 +51,13 @@ func GetType(message string) (string, error) {
 // ⬇️ Tasks
 
 type GeneratedTask struct {
-	Emoji    string `json:"emoji"`
-	Task     string `json:"task"`
-	Deadline string `json:"deadline"`
-	Priority int64  `json:"priority"`
-	Body     string `json:"body"`
-	Course   string `json:"course"`
-	Project  string `json:"project"`
+	Emoji    string   `json:"emoji"`
+	Task     string   `json:"task"`
+	Deadline string   `json:"deadline"`
+	Priority int64    `json:"priority"`
+	Body     string   `json:"body"`
+	Course   []string `json:"course"`
+	Project  []string `json:"project"`
 }
 
 func IngestTask(task string) error {
