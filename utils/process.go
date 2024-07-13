@@ -1,5 +1,7 @@
 package process
 
+import "log"
+
 func Process(message string) error {
 	// mType, err := GetType(message)
 
@@ -14,7 +16,11 @@ func Process(message string) error {
 	// 	return fmt.Errorf("did not identify message type")
 	// }
 
-	IngestTask(message)
+	err := IngestTask(message)
+
+	if err != nil {
+		log.Println("ERROR: " + err.Error())
+	}
 
 	return nil
 }

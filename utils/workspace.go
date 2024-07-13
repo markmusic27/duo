@@ -3,7 +3,6 @@ package process
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 )
@@ -51,6 +50,16 @@ func GetType(message string) (string, error) {
 
 // ⬇️ Tasks
 
+type GeneratedTask struct {
+	Emoji    string `json:"emoji"`
+	Task     string `json:"task"`
+	Deadline string `json:"deadline"`
+	Priority int64  `json:"priority"`
+	Body     string `json:"body"`
+	Course   string `json:"course"`
+	Project  string `json:"project"`
+}
+
 func IngestTask(task string) error {
 	template := TaskTemplate
 
@@ -93,7 +102,19 @@ func IngestTask(task string) error {
 
 	template = strings.ReplaceAll(template, "*PROJECTS*", projectContext)
 
-	log.Println(template)
+	// Send request to OpenAI
+	res, err := Prompt(task, template)
+
+	if err != nil {
+		return err
+	}
+
+	var generated GeneratedTask
+	err = json.Unmarshal([]byte(CleanCode(res)), &generated)
+
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
