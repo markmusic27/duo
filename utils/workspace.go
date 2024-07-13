@@ -2,6 +2,7 @@ package process
 
 import (
 	"encoding/json"
+	"log"
 	"strings"
 	"time"
 )
@@ -58,7 +59,19 @@ func IngestTask(task string) (string, error) {
 	template = strings.ReplaceAll(template, "*WEEKDAY*", currentTime.Weekday().String())
 
 	// Add Notion context
-	FetchCourses()
+	filter := &Filter{
+		Property: "Status",
+		Status: &StatusFilter{
+			Equals: "In progress",
+		},
+	}
+	res, err := FetchCourses(filter)
+
+	if err != nil {
+		return "", nil
+	}
+
+	log.Println(res)
 
 	return template, nil
 }

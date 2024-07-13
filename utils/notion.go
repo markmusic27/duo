@@ -75,14 +75,9 @@ type CourseProperties struct {
 	Website        WebsiteProp `json:"Website"`
 }
 
-func FetchCourses() ([]Course, error) {
+func FetchCourses(filter *Filter) ([]Course, error) {
 	requestBody := DatabaseQueryBody{
-		Filter: &Filter{
-			Property: "Status",
-			Status: &StatusFilter{
-				Equals: "In progress",
-			},
-		},
+		Filter: filter,
 	}
 
 	jsonData, err := json.Marshal(requestBody)
