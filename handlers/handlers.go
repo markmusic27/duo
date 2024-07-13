@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	process "github.com/markmusic27/workspace/utils"
 )
 
 func InboundHTTPRequest(c *gin.Context) {
@@ -35,5 +34,5 @@ func InboundSMSRequest(c *gin.Context) {
 		"status": "Message is being processed!",
 	})
 
-	process.Process(c.PostForm("Body"))
+	// Add line to process
 }

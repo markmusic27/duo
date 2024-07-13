@@ -7,7 +7,7 @@ Databases IDs (the message is a...):
 *DB*
 
 Respond in JSON format:
-{"db": "Enter Database ID"}
+{"type": "Enter Database ID"}
 `
 
 const TaskTemplate = `

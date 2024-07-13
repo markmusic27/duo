@@ -3,33 +3,39 @@ package process
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
+	"os"
 )
 
-type Message struct {
+// ⬇️ OpenAI Types
+type OAIMessage struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
 }
 
-type RequestBody struct {
-	Model    string    `json:"model"`
-	Messages []Message `json:"messages"`
+type OAIRequestBody struct {
+	Model    string       `json:"model"`
+	Messages []OAIMessage `json:"messages"`
 }
 
 type ResponseChoice struct {
-	Message Message `json:"message"`
+	Message OAIMessage `json:"message"`
 }
 
-type ResponseBody struct {
+type OAIResponseBody struct {
 	Choices []ResponseChoice `json:"choices"`
 }
+
+// ⬇️ OpenAI Calls
 
 const OpenAIEndpoint = "https://api.openai.com/v1/chat/completions"
 
 func Prompt(user string, system string) (string, error) {
-	requestBody := RequestBody{
+	requestBody := OAIRequestBody{
 		Model: "gpt-4o",
-		Messages: []Message{
+		Messages: []OAIMessage{
 			{Role: "system", Content: system},
 			{Role: "user", Content: user},
 		},
@@ -42,4 +48,40 @@ func Prompt(user string, system string) (string, error) {
 	}
 
 	req, err := http.NewRequest("POST", OpenAIEndpoint, bytes.NewBuffer(jsonData))
+
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", os.Getenv("OPENAI")))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	// Unmarshal the response body
+	var responseBody OAIResponseBody
+	err = json.Unmarshal(body, &responseBody)
+	if err != nil {
+		return "", err
+	}
+
+	// Return the content of the first choice
+	if len(responseBody.Choices) > 0 {
+		return responseBody.Choices[0].Message.Content, nil
+	}
+
+	return "", fmt.Errorf("no response from OpenAI")
+
 }
