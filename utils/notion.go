@@ -40,18 +40,26 @@ type EmailProp struct {
 }
 
 type SelectProp struct {
+	Select Select `json:"select"`
+}
+
+type Select struct {
 	Name string `json:"name"`
 }
 
 type DateProp struct {
+	Date Date `json:"date"`
+}
+
+type Date struct {
 	Start string `json:"start"`
 }
 
 type RelationProp struct {
-	Pages []RelationPage `json:"relation"`
+	Pages []Page `json:"relation"`
 }
 
-type RelationPage struct {
+type Page struct {
 	ID string `json:"id"`
 }
 
@@ -237,4 +245,46 @@ type TaskProperties struct {
 	DueDate  DateProp      `json:"Due Date"`
 	Course   RelationProp  `json:"Course"`
 	Project  RelationProp  `json:"Project"`
+}
+
+func CreateTask(task Task) (string, error) {
+	jsonData, err := json.Marshal(task)
+
+	if err != nil {
+		return "", err
+	}
+
+	req, err := http.NewRequest("POST", NotionPageCreationEndpoint, bytes.NewBuffer(jsonData))
+
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Notion-Version", "2022-06-28")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", os.Getenv("NOTION")))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	// Unmarshall body
+	var page Page
+	err = json.Unmarshal(body, &page)
+
+	if err != nil {
+		return "", fmt.Errorf("Failed to create page: " + err.Error() + "\n\nNotion Response:\n" + string(body))
+	}
+
+	return page.ID, nil
 }
