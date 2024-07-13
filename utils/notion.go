@@ -12,7 +12,7 @@ import (
 
 // ⬇️ Notion Endpoints
 
-const NotionDatabaseQueryEndpoint = "https://api.notion.com/v1/databases/*COURSEID*/query"
+const NotionDatabaseQueryEndpoint = "https://api.notion.com/v1/databases/*ID*/query"
 
 // ⬇️ Database Query Body
 type DatabaseQueryBody struct {
@@ -51,7 +51,7 @@ type Token struct {
 }
 
 type NameProp struct {
-	Title []Token `json:"rich_text"`
+	Title []Token `json:"title"`
 }
 
 // ⬇️ Course
@@ -67,7 +67,7 @@ type Course struct {
 }
 
 type CourseProperties struct {
-	Name           TextProp    `json:"Name"`
+	Name           NameProp    `json:"Name"`
 	Description    TextProp    `json:"Description"`
 	Professor      TextProp    `json:"Professor"`
 	ProfessorEmail EmailProp   `json:"Professor Email"`
@@ -86,7 +86,7 @@ func FetchCourses(filter *Filter) ([]Course, error) {
 		return nil, err
 	}
 
-	endpoint := strings.ReplaceAll(NotionDatabaseQueryEndpoint, "*COURSEID*", os.Getenv("COURSEID"))
+	endpoint := strings.ReplaceAll(NotionDatabaseQueryEndpoint, "*ID*", os.Getenv("COURSEID"))
 	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(jsonData))
 
 	if err != nil {
@@ -122,3 +122,64 @@ func FetchCourses(filter *Filter) ([]Course, error) {
 }
 
 // ⬇️ Projects
+
+type Project struct {
+	ID         string            `json:"id"`
+	Properties ProjectProperties `json:"properties"`
+	URL        string            `json:"url"`
+}
+
+type ProjectProperties struct {
+	Name NameProp `json:"name"`
+}
+
+type ProjectResponse struct {
+	Projects []Project `json:"results"`
+}
+
+func FetchProjects(filter *Filter) ([]Project, error) {
+	requestBody := DatabaseQueryBody{
+		Filter: filter,
+	}
+
+	jsonData, err := json.Marshal(requestBody)
+
+	if err != nil {
+		return nil, err
+	}
+
+	endpoint := strings.ReplaceAll(NotionDatabaseQueryEndpoint, "*ID*", os.Getenv("PROJECTID"))
+	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(jsonData))
+
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Notion-Version", "2022-06-28")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", os.Getenv("NOTION")))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshall body
+	var response ProjectResponse
+	err = json.Unmarshal(body, &response)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Projects, nil
+}

@@ -2,6 +2,7 @@ package process
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -50,7 +51,7 @@ func GetType(message string) (string, error) {
 
 // ⬇️ Tasks
 
-func IngestTask(task string) (string, error) {
+func IngestTask(task string) error {
 	template := TaskTemplate
 
 	// Add date information
@@ -58,20 +59,41 @@ func IngestTask(task string) (string, error) {
 	template = strings.ReplaceAll(template, "*DATE*", currentTime.Format(time.RFC3339))
 	template = strings.ReplaceAll(template, "*WEEKDAY*", currentTime.Weekday().String())
 
-	// Add Notion context
+	// Add Course context
 	filter := &Filter{
 		Property: "Status",
 		Status: &StatusFilter{
 			Equals: "In progress",
 		},
 	}
-	res, err := FetchCourses(filter)
+	courses, err := FetchCourses(filter)
 
 	if err != nil {
-		return "", nil
+		return err
 	}
 
-	log.Println(res)
+	courseContext := ""
+	for _, course := range courses {
+		courseContext = courseContext + fmt.Sprintf("\n\t - %s: %s", course.Properties.Name.Title[0].Text, course.ID)
+	}
 
-	return template, nil
+	template = strings.ReplaceAll(template, "*COURSES*", courseContext)
+
+	// Add Project context
+	projects, err := FetchProjects(filter)
+
+	if err != nil {
+		return err
+	}
+
+	projectContext := ""
+	for _, project := range projects {
+		projectContext = projectContext + fmt.Sprintf("\n\t - %s: %s", project.Properties.Name.Title[0].Text, project.ID)
+	}
+
+	template = strings.ReplaceAll(template, "*PROJECTS*", projectContext)
+
+	log.Println(template)
+
+	return nil
 }
