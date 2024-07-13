@@ -37,7 +37,7 @@ func GetType(message string) (string, error) {
 
 	var res GetTypeResponseBody
 
-	err = json.Unmarshal([]byte(raw), &res)
+	err = json.Unmarshal([]byte(CleanCode(raw)), &res)
 
 	if err != nil {
 		return "", err

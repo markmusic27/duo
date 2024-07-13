@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
 )
 
 // ⬇️ OpenAI Types
@@ -84,4 +85,12 @@ func Prompt(user string, system string) (string, error) {
 
 	return "", fmt.Errorf("no response from OpenAI")
 
+}
+
+func CleanCode(input string) string {
+
+	pattern := regexp.MustCompile("(?i)```[a-z]*\n|```")
+
+	cleaned := pattern.ReplaceAllString(input, "")
+	return cleaned
 }

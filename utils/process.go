@@ -1,6 +1,8 @@
 package process
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func Process(message string) error {
 	mType, err := GetType(message)
@@ -11,7 +13,7 @@ func Process(message string) error {
 
 	switch mType {
 	case "task":
-		// Run task code
+		// Add task code
 	default:
 		return fmt.Errorf("did not identify message type")
 	}

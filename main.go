@@ -16,7 +16,7 @@ func main() {
 		return
 	}
 
-	process.Process("Finish math problem set tomorrow at 1pm")
+	err = process.Process("Finish math problem set tomorrow at 1pm")
 
 	// // Setup API
 	// api := gin.Default()
