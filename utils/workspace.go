@@ -58,6 +58,7 @@ func IngestTask(task string) (string, error) {
 	template = strings.ReplaceAll(template, "*WEEKDAY*", currentTime.Weekday().String())
 
 	// Add Notion context
+	FetchCourses()
 
 	return template, nil
 }
