@@ -3,6 +3,7 @@ package process
 import (
 	"encoding/json"
 	"strings"
+	"time"
 )
 
 var Databases = []string{"task", "note"}
@@ -47,3 +48,16 @@ func GetType(message string) (string, error) {
 }
 
 // ⬇️ Tasks
+
+func IngestTask(task string) (string, error) {
+	template := TaskTemplate
+
+	// Add date information
+	currentTime := time.Now()
+	template = strings.ReplaceAll(template, "*DATE*", currentTime.Format(time.RFC3339))
+	template = strings.ReplaceAll(template, "*WEEKDAY*", currentTime.Weekday().String())
+
+	// Add Notion context
+
+	return template, nil
+}
