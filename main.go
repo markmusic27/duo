@@ -16,7 +16,7 @@ func main() {
 		return
 	}
 
-	err = process.Process("Finish PDE math problem set tomorrow at 1pm p1")
+	err = process.Process("Review senior thesis details with Mr. Tim Harris power course p1 next monday at 2pm. Meeting details in Canvas / Zoom")
 
 	// // Setup API
 	// api := gin.Default()

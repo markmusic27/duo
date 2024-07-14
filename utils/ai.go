@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strconv"
 )
 
 // ⬇️ OpenAI Types
@@ -93,4 +94,28 @@ func CleanCode(input string) string {
 
 	cleaned := pattern.ReplaceAllString(input, "")
 	return cleaned
+}
+
+func ConvertNumToPriority(input int64) string {
+	if input == 1 {
+		return "P1 🔥"
+	}
+
+	return "P" + strconv.FormatInt(input, 10)
+}
+
+func GeneratePageFromStrings(raw []string) []Page {
+	var pages []Page
+
+	if len(raw) == 0 {
+		return []Page{}
+	}
+
+	for _, id := range raw {
+		pages = append(pages, Page{
+			ID: id,
+		})
+	}
+
+	return pages
 }

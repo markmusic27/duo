@@ -3,6 +3,7 @@ package process
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 )
@@ -60,7 +61,7 @@ type GeneratedTask struct {
 	Project  []string `json:"project"`
 }
 
-func IngestTask(task string) error {
+func IngestTask(task string) (string, error) {
 	template := TaskTemplate
 
 	// Add date information
@@ -78,7 +79,7 @@ func IngestTask(task string) error {
 	courses, err := FetchCourses(filter)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	courseContext := ""
@@ -92,7 +93,7 @@ func IngestTask(task string) error {
 	projects, err := FetchProjects(filter)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	projectContext := ""
@@ -106,15 +107,61 @@ func IngestTask(task string) error {
 	res, err := Prompt(task, template)
 
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	var generated GeneratedTask
 	err = json.Unmarshal([]byte(CleanCode(res)), &generated)
 
 	if err != nil {
-		return err
+		return "", fmt.Errorf("Failed to unmarshall: " + err.Error() + "\n\n Generated Task:\n" + res)
 	}
 
-	return nil
+	// Creates new task object based on information
+
+	newTask := Task{
+		Parent: ParentDatabase{
+			Type:       "database_id",
+			DatabaseID: os.Getenv("TASKID"),
+		},
+		Icon: Icon{
+			Type:  "emoji",
+			Emoji: generated.Emoji,
+		},
+		Properties: TaskProperties{
+			Name: NameWriteProp{
+				Title: []TokenWrite{
+					{
+						Text: TextWrite{
+							Content: generated.Task,
+						},
+					},
+				},
+			},
+			Priority: SelectProp{
+				Select: Select{
+					Name: ConvertNumToPriority(generated.Priority),
+				},
+			},
+			DueDate: DateProp{
+				Date: Date{
+					Start: generated.Deadline,
+				},
+			},
+			Course: RelationProp{
+				Pages: GeneratePageFromStrings(generated.Course),
+			},
+			Project: RelationProp{
+				Pages: GeneratePageFromStrings(generated.Project),
+			},
+		},
+	}
+
+	id, err := CreateTask(newTask)
+
+	if err != nil {
+		return "", err
+	}
+
+	return id, nil
 }
