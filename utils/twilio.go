@@ -47,3 +47,11 @@ func Message(phone string, message string) error {
 
 	return nil
 }
+
+func TruncateString(input string) string {
+	maxLength := 100
+	if len(input) > maxLength {
+		return input[:maxLength]
+	}
+	return input
+}

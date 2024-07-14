@@ -4,7 +4,9 @@ import (
 	"fmt"
 )
 
-func Process(message string) error {
+const SuccessMessage = "Logged ✅"
+
+func Process(message string, from string) error {
 	mType, err := GetType(message)
 
 	if err != nil {
@@ -18,6 +20,8 @@ func Process(message string) error {
 		if err != nil {
 			return err
 		}
+
+		Message(from, SuccessMessage)
 	default:
 		return fmt.Errorf("did not identify message type")
 	}

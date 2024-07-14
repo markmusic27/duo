@@ -36,5 +36,9 @@ func InboundSMSRequest(c *gin.Context) {
 	})
 
 	// Add line to process
-	process.Process(c.PostForm("Body"))
+	err := process.Process(c.PostForm("Body"), c.PostForm("From"))
+
+	if err != nil {
+		process.Message(c.PostForm("From"), process.TruncateString(err.Error()))
+	}
 }
