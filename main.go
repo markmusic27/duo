@@ -16,9 +16,7 @@ func main() {
 		return
 	}
 
-	err = process.Process("Review senior thesis details with Mr. Tim Harris power course p1 next monday at 2pm. Meeting details in Canvas / Zoom")
-
-	// // Setup API
+	// Setup API
 	// api := gin.Default()
 
 	// const port = "8080"
@@ -34,4 +32,6 @@ func main() {
 
 	// log.Println("Starting server on port " + port)
 	// api.Run(":" + port)
+
+	process.Message("+506 71099519", "Logged ✅")
 }
