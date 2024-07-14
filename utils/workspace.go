@@ -155,6 +155,22 @@ func IngestTask(task string) (string, error) {
 				Pages: GeneratePageFromStrings(generated.Project),
 			},
 		},
+		Children: []Child{
+			{
+				Object: "block",
+				Type:   "paragraph",
+				Paragraph: &PageText{
+					Tokens: []PageToken{
+						{
+							Type: "text",
+							Text: TextWrite{
+								Content: generated.Body,
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	id, err := CreateTask(newTask)

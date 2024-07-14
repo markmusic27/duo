@@ -35,6 +35,22 @@ type StatusFilter struct {
 }
 
 // ⬇️ General Props
+
+type Child struct {
+	Object    string    `json:"object"`
+	Type      string    `json:"type"`
+	Paragraph *PageText `json:"paragraph"`
+}
+
+type PageText struct {
+	Tokens []PageToken `json:"rich_text"`
+}
+
+type PageToken struct {
+	Type string    `json:"type"`
+	Text TextWrite `json:"text"`
+}
+
 type EmailProp struct {
 	Email string `json:"email"`
 }
@@ -232,6 +248,7 @@ type Task struct {
 	Parent     ParentDatabase `json:"parent"`
 	Icon       Icon           `json:"icon"`
 	Properties TaskProperties `json:"properties"`
+	Children   []Child        `json:"children"`
 }
 
 type ParentDatabase struct {

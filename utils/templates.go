@@ -10,6 +10,8 @@ Respond in JSON format:
 {"type": "Enter Database ID"}
 `
 
+const ProhibitedEmojis = "\nProhibited Emojis: 📚, ✈️ "
+
 const TaskTemplate = `
 You act as my executive assistant. You take message I send you and extract the data necessary to catalog it as a task in my Notion. Respond only with the following JSON format:
 
@@ -28,7 +30,7 @@ Context:
 - Day of week: *WEEKDAY*
 - Courses: *COURSES*
 - Projects: *PROJECTS*
-`
+` + ProhibitedEmojis
 
 const NoteTemplate = `
-`
+` + ProhibitedEmojis
