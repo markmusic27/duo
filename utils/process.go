@@ -22,6 +22,8 @@ func Process(message string, from string) error {
 		}
 
 		Message(from, SuccessMessage)
+	case "note":
+		// Handle note details
 	default:
 		return fmt.Errorf("did not identify message type")
 	}

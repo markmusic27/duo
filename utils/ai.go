@@ -34,9 +34,17 @@ type OAIResponseBody struct {
 
 const OpenAIEndpoint = "https://api.openai.com/v1/chat/completions"
 
-func Prompt(user string, system string) (string, error) {
+func Prompt(user string, system string, model ...string) (string, error) {
+	var selectedModel string
+
+	if len(model) == 0 {
+		selectedModel = "gpt4-o"
+	} else {
+		selectedModel = model[0]
+	}
+
 	requestBody := OAIRequestBody{
-		Model: "gpt-4o",
+		Model: selectedModel,
 		Messages: []OAIMessage{
 			{Role: "system", Content: system},
 			{Role: "user", Content: user},

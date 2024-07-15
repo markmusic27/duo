@@ -3,6 +3,9 @@ module github.com/markmusic27/workspace
 go 1.19
 
 require (
+	github.com/JohannesKaufmann/html-to-markdown v1.6.0 // indirect
+	github.com/PuerkitoBio/goquery v1.9.2 // indirect
+	github.com/andybalholm/cascadia v1.3.2 // indirect
 	github.com/bytedance/sonic v1.11.9 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
