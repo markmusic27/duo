@@ -242,6 +242,69 @@ func FetchProjects(filter *Filter) ([]Project, error) {
 	return response.Projects, nil
 }
 
+// ⬇️ Areas / Interests
+type AreaInterestResponse struct {
+	AreasInterests []AreaInterest `json:"results"`
+}
+
+type AreaInterest struct {
+	ID         string            `json:"id"`
+	Properties AreaInterestProps `json:"properties"`
+	URL        string            `json:"url"`
+}
+
+type AreaInterestProps struct {
+	Name NameProp `json:"Name"`
+}
+
+func FetchAreasInterests(filter *Filter) ([]AreaInterest, error) {
+	requestBody := DatabaseQueryBody{
+		Filter: filter,
+	}
+
+	jsonData, err := json.Marshal(requestBody)
+
+	if err != nil {
+		return nil, err
+	}
+
+	endpoint := strings.ReplaceAll(NotionDatabaseQueryEndpoint, "*ID*", os.Getenv("AREAINTERESTID"))
+	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(jsonData))
+
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Notion-Version", "2022-06-28")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", os.Getenv("NOTION")))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshall body
+	var response AreaInterestResponse
+	err = json.Unmarshal(body, &response)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return response.AreasInterests, nil
+}
+
 // ⬇️ Tasks
 
 type Task struct {

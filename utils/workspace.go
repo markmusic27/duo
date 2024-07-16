@@ -3,7 +3,6 @@ package process
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/url"
 	"os"
 	"strings"
@@ -192,38 +191,36 @@ type LinkContextResponse struct {
 }
 
 func IngestNote(note string) (string, error) {
-	raw, err := Prompt(note, IngestNoteTemplate, "gpt-3.5-turbo")
-	if err != nil {
-		return "", err
-	}
+	// raw, err := Prompt(note, IngestNoteTemplate, "gpt-3.5-turbo")
+	// if err != nil {
+	// 	return "", err
+	// }
 
-	var data LinkContextResponse
-	err = json.Unmarshal([]byte(CleanCode(raw)), &data)
-	if err != nil {
-		return "", err
-	}
+	// var data LinkContextResponse
+	// err = json.Unmarshal([]byte(CleanCode(raw)), &data)
+	// if err != nil {
+	// 	return "", err
+	// }
 
-	linkContext := ""
-	if len(data.URLS) != 0 {
-		for i, urlI := range data.URLS {
-			linkData, err := ChannelLink(urlI)
-			if err != nil {
-				return "", nil
-			}
+	// linkContext := ""
+	// if len(data.URLS) != 0 {
+	// 	for i, urlI := range data.URLS {
+	// 		linkData, err := ChannelLink(urlI)
+	// 		if err != nil {
+	// 			return "", nil
+	// 		}
 
-			var newLine string
+	// 		var newLine string
 
-			if i == 0 {
-				newLine = ""
-			} else {
-				newLine = "\n"
-			}
+	// 		if i == 0 {
+	// 			newLine = ""
+	// 		} else {
+	// 			newLine = "\n"
+	// 		}
 
-			linkContext = linkContext + newLine + linkData
-		}
-	}
-
-	log.Println(linkContext)
+	// 		linkContext = linkContext + newLine + linkData
+	// 	}
+	// }
 
 	return "", nil
 }
