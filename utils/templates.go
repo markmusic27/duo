@@ -39,3 +39,12 @@ const NoteTemplate = `
 const SummarizationTemplate = `
 You are tasked with condensing Markdown text. Summarize the file into a short paragraph on the main ideas of the text.
 `
+
+const IngestNoteTemplate = `
+You are tasked with identifying if there is a link / URL within this message. Respond only with the following JSON format:
+
+{
+"urls": ["Add link/url. If there is none, return an empty array", "May add more than one if provided"],
+"message": "There may be more text beyond the url in the message. Extract and place the rest here. Leave empty if there isn't."
+}
+`

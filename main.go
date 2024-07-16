@@ -16,7 +16,7 @@ func main() {
 		return
 	}
 
-	_, err = process.IngestNote("https://www.youtube.com/watch?v=oZHoEvYM8i0")
+	_, err = process.IngestNote("https://www.youtube.com/watch?v=oZHoEvYM8i0 watch this and note how he uses pomodoro https://stanford.edu")
 
 	if err != nil {
 		log.Println(err)

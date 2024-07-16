@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -33,7 +34,7 @@ func GetType(message string) (string, error) {
 
 	template := strings.ReplaceAll(TypeTemplate, "*DB*", db)
 
-	raw, err := Prompt(message, template)
+	raw, err := Prompt(message, template, "gpt-3.5-turbo")
 
 	if err != nil {
 		return "", err
@@ -183,15 +184,75 @@ func IngestTask(task string) (string, error) {
 	return id, nil
 }
 
+// ⬇️ Notes
+
+type LinkContextResponse struct {
+	Message string   `json:"message"`
+	URLS    []string `json:"urls"`
+}
+
 func IngestNote(note string) (string, error) {
-
-	data, err := FetchYoutubeData("https://youtu.be/A_BjvkJOetA?si=6vNoFX7swBViIf3e")
-
+	raw, err := Prompt(note, IngestNoteTemplate, "gpt-3.5-turbo")
 	if err != nil {
 		return "", err
 	}
 
-	log.Println(data)
+	var data LinkContextResponse
+	err = json.Unmarshal([]byte(CleanCode(raw)), &data)
+	if err != nil {
+		return "", err
+	}
+
+	linkContext := ""
+	if len(data.URLS) != 0 {
+		for i, urlI := range data.URLS {
+			linkData, err := ChannelLink(urlI)
+			if err != nil {
+				return "", nil
+			}
+
+			var newLine string
+
+			if i == 0 {
+				newLine = ""
+			} else {
+				newLine = "\n"
+			}
+
+			linkContext = linkContext + newLine + linkData
+		}
+	}
+
+	log.Println(linkContext)
 
 	return "", nil
+}
+
+func ChannelLink(link string) (string, error) {
+	u, err := url.Parse(link)
+	if err != nil {
+		return "", fmt.Errorf("URL is not a link")
+	}
+
+	switch u.Host {
+	case "www.youtube.com", "youtube.com", "youtu.be":
+		data, err := FetchYoutubeData(link)
+		if err != nil {
+			return "", err
+		}
+
+		return data, nil
+	case "www.instagram.com", "instagram.com":
+		// TODO: Add Instagram API integration
+
+		return "", nil
+	default:
+		data, err := ContextualizeLink(link)
+		if err != nil {
+			return "", err
+		}
+
+		return fmt.Sprintf("Website Context:\n\t- URL: %s\n\t- Content Summary: %s", link, data), nil
+	}
+
 }

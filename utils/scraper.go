@@ -97,26 +97,6 @@ func ExtractYoutubeID(video string) (string, error) {
 	return videoID, nil
 }
 
-// func GetYouTubeVideoTitle(apiKey, videoID string) (string, error) {
-// 	ctx := context.Background()
-// 	service, err := youtube.NewService(ctx, option.WithAPIKey(apiKey))
-// 	if err != nil {
-// 		return "", err
-// 	}
-
-// 	call := service.Videos.List([]string{"snippet"}).Id(videoID)
-// 	response, err := call.Do()
-// 	if err != nil {
-// 		return "", err
-// 	}
-
-// 	if len(response.Items) == 0 {
-// 		return "", fmt.Errorf("no video found with the given ID")
-// 	}
-
-// 	return response.Items[0].Snippet.Title, nil
-// }
-
 func FetchYoutubeData(video string) (string, error) {
 	ctx := context.Background()
 	service, err := youtube.NewService(ctx, option.WithAPIKey(os.Getenv("GCP_KEY")))
@@ -144,7 +124,7 @@ YouTuve Video Context:
 	- Title: %s
 	- Channel: %s
 	- Description: %s
-	`, res.Items[0].Snippet.Title, res.Items[0].Snippet.ChannelTitle, ClampString(res.Items[0].Snippet.Description, 500))
+	`, res.Items[0].Snippet.Title, res.Items[0].Snippet.ChannelTitle, RemoveNewline(ClampString(res.Items[0].Snippet.Description, 250)))
 
 	return data, nil
 }
