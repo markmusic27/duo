@@ -47,7 +47,7 @@ You are an extension of me. You take message I send you and extract the data nec
 }
 
 Context:
-- Type: *TYPES*
+- Types: *TYPES*
 - Areas: *AREAS*
 - Projects: *PROJECTS*
 ` + ProhibitedEmojis + NotePersonality

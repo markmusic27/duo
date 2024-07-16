@@ -223,12 +223,44 @@ func IngestNote(note string) (string, error) {
 	// 	}
 	// }
 
+	template := NoteTemplate
+
+	// Add types context
 	types, err := FetchNoteTypes()
 	if err != nil {
 		return "", err
 	}
 
-	log.Println(types)
+	typesContext := ""
+	for _, t := range types {
+		typesContext = typesContext + "\n\t- " + fmt.Sprintf(`"%s"`, t)
+	}
+
+	template = strings.ReplaceAll(template, "*TYPES*", typesContext)
+
+	// Add projects context
+	filter := &Filter{
+		Property: "Status",
+		Status: &StatusFilter{
+			Equals: "In progress",
+		},
+	}
+	projects, err := FetchProjects(filter)
+
+	if err != nil {
+		return "", err
+	}
+
+	projectContext := ""
+	for _, project := range projects {
+		projectContext = projectContext + fmt.Sprintf("\n\t - %s: %s", project.Properties.Name.Title[0].Text, project.ID)
+	}
+
+	template = strings.ReplaceAll(template, "*PROJECTS*", projectContext)
+
+	// Add area/interest context
+
+	log.Println(template)
 
 	return "", nil
 }
