@@ -305,6 +305,78 @@ func FetchAreasInterests(filter *Filter) ([]AreaInterest, error) {
 	return response.AreasInterests, nil
 }
 
+func FetchNoteTypes() ([]string, error) {
+	endpoint := fmt.Sprintf("https://api.notion.com/v1/databases/%s", os.Getenv("NOTESID"))
+	req, err := http.NewRequest("GET", endpoint, nil)
+
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Notion-Version", "2022-06-28")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", os.Getenv("NOTION")))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshall body
+	var data map[string]interface{}
+	if err := json.Unmarshal(body, &data); err != nil {
+		return nil, err
+	}
+
+	return ExtractNoteTypes(data), nil
+}
+
+func ExtractNoteTypes(data map[string]interface{}) []string {
+	var types []string
+
+	properties, ok := data["properties"].(map[string]interface{})
+	if !ok {
+		return types
+	}
+
+	typeProperty, ok := properties["Type"].(map[string]interface{})
+	if !ok {
+		return types
+	}
+
+	selectProperty, ok := typeProperty["select"].(map[string]interface{})
+	if !ok {
+		return types
+	}
+
+	options, ok := selectProperty["options"].([]interface{})
+	if !ok {
+		return types
+	}
+
+	for _, option := range options {
+		optionMap, ok := option.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		if name, ok := optionMap["name"].(string); ok {
+			types = append(types, name)
+		}
+	}
+
+	return types
+}
+
 // ⬇️ Tasks
 
 type Task struct {

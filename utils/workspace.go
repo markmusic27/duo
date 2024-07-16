@@ -3,6 +3,7 @@ package process
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/url"
 	"os"
 	"strings"
@@ -221,6 +222,13 @@ func IngestNote(note string) (string, error) {
 	// 		linkContext = linkContext + newLine + linkData
 	// 	}
 	// }
+
+	types, err := FetchNoteTypes()
+	if err != nil {
+		return "", err
+	}
+
+	log.Println(types)
 
 	return "", nil
 }
