@@ -38,7 +38,7 @@ func Prompt(user string, system string, model ...string) (string, error) {
 	var selectedModel string
 
 	if len(model) == 0 {
-		selectedModel = "gpt4-o"
+		selectedModel = "gpt-4o"
 	} else {
 		selectedModel = model[0]
 	}

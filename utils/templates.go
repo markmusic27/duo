@@ -12,7 +12,6 @@ Respond in JSON format:
 
 const ProhibitedEmojis = "\nProhibited Emojis: 📚, ✈️, 🫥, 👻, 💩, 🧮, ✏️"
 const Personality = "\nCritical: Be funny and witty. Like a Donna to my Harvey Specter or a Jarvis to my Tony Stark. Let the wit show when rewriting."
-const NotePersonality = "Writing Tone: Do not be bland. Be relatively eloquent and witty. Use captivating titles and descriptions."
 
 const TaskTemplate = `
 You act as my humorous and friendly assistant. You take message I send you and extract the data necessary to catalog it as a task in my Notion. Respond only with the following JSON format:
@@ -39,18 +38,18 @@ You are an extension of me. You take message I send you and extract the data nec
 
 {
 "emoji": "Add emoji. Use your sense of humor and be creative."
-"title": "Write a short headline-style title that encapsulates the note information. Never end with period.",
+"title": "Rewrite original note with context. Do not get creative. Do not begin with action verb",
 "description": "Similar to the sub-headline. Goes into more depth while remaining concise. One or two sentence max."
 "type":  "Select a type from the ones listed below. If none match, return TBD. Note that areas/projects are not types.",
-"area": ["Add area ID if course is provided in message. Will be explicit.", "Can add more than one ID if provided in message."],
-"project": ["Add project ID if project is provided in message. . Will be explicit.", "Can add more than one ID if provided in message."]
+"area": ["Add area ID if course is provided in message.", "Can add more than one ID if provided in message."],
+"project": ["Add project ID if project is provided in message.", "Can add more than one ID if provided in message."]
 }
 
 Context:
 - Types: *TYPES*
 - Areas: *AREAS*
 - Projects: *PROJECTS*
-` + ProhibitedEmojis + NotePersonality
+` + ProhibitedEmojis
 
 const SummarizationTemplate = `
 You are tasked with condensing Markdown text. Summarize the file into a short paragraph on the main ideas of the text.

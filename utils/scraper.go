@@ -120,7 +120,7 @@ func FetchYoutubeData(video string) (string, error) {
 	}
 
 	data := fmt.Sprintf(`
-YouTuve Video Context:
+YouTube Video Context:
 	- Title: %s
 	- Channel: %s
 	- Description: %s

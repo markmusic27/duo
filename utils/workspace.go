@@ -191,37 +191,46 @@ type LinkContextResponse struct {
 	URLS    []string `json:"urls"`
 }
 
+type GeneratedNote struct {
+	Emoji       string   `json:"emoji"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Type        string   `json:"type"`
+	Area        []string `json:"area"`
+	Project     []string `json:"project"`
+}
+
 func IngestNote(note string) (string, error) {
-	// raw, err := Prompt(note, IngestNoteTemplate, "gpt-3.5-turbo")
-	// if err != nil {
-	// 	return "", err
-	// }
+	raw, err := Prompt(note, IngestNoteTemplate)
+	if err != nil {
+		return "", err
+	}
 
-	// var data LinkContextResponse
-	// err = json.Unmarshal([]byte(CleanCode(raw)), &data)
-	// if err != nil {
-	// 	return "", err
-	// }
+	var data LinkContextResponse
+	err = json.Unmarshal([]byte(CleanCode(raw)), &data)
+	if err != nil {
+		return "", err
+	}
 
-	// linkContext := ""
-	// if len(data.URLS) != 0 {
-	// 	for i, urlI := range data.URLS {
-	// 		linkData, err := ChannelLink(urlI)
-	// 		if err != nil {
-	// 			return "", nil
-	// 		}
+	linkContext := ""
+	if len(data.URLS) != 0 {
+		for i, urlI := range data.URLS {
+			linkData, err := ChannelLink(urlI)
+			if err != nil {
+				return "", nil
+			}
 
-	// 		var newLine string
+			var newLine string
 
-	// 		if i == 0 {
-	// 			newLine = ""
-	// 		} else {
-	// 			newLine = "\n"
-	// 		}
+			if i == 0 {
+				newLine = ""
+			} else {
+				newLine = "\n"
+			}
 
-	// 		linkContext = linkContext + newLine + linkData
-	// 	}
-	// }
+			linkContext = linkContext + newLine + linkData
+		}
+	}
 
 	template := NoteTemplate
 
@@ -271,7 +280,15 @@ func IngestNote(note string) (string, error) {
 
 	template = strings.ReplaceAll(template, "*AREAS*", areainterestContext)
 
-	log.Println(template)
+	// Make request to OpenAI servers
+	userMessage := fmt.Sprintf("Original note: %s\n\n%s", data.Message, linkContext)
+
+	gen, err := Prompt(userMessage, template)
+	if err != nil {
+		return "", err
+	}
+
+	log.Println(gen)
 
 	return "", nil
 }
