@@ -184,38 +184,14 @@ func IngestTask(task string) (string, error) {
 }
 
 func IngestNote(note string) (string, error) {
-	context, err := ContextualizeLink(note)
+
+	data, err := FetchYoutubeData("https://youtu.be/A_BjvkJOetA?si=6vNoFX7swBViIf3e")
 
 	if err != nil {
 		return "", err
 	}
 
-	log.Println(context)
+	log.Println(data)
 
 	return "", nil
-}
-
-func ContextualizeLink(url string) (string, error) {
-	body, err := FetchPageContent(url)
-
-	if err != nil {
-		return "", err
-	}
-
-	const limit = 40000
-	var capped string
-
-	if len(body) > limit {
-		capped = body[:limit]
-	} else {
-		capped = body
-	}
-
-	summary, err := Prompt(capped, SummarizationTemplate, "gpt-3.5-turbo")
-
-	if err != nil {
-		return "", err
-	}
-
-	return summary, nil
 }

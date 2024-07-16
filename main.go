@@ -16,7 +16,7 @@ func main() {
 		return
 	}
 
-	_, err = process.IngestNote("https://landing-page-j9i9qxm8h-safe.vercel.app/")
+	_, err = process.IngestNote("https://www.youtube.com/watch?v=oZHoEvYM8i0")
 
 	if err != nil {
 		log.Println(err)
