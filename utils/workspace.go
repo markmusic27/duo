@@ -259,6 +259,17 @@ func IngestNote(note string) (string, error) {
 	template = strings.ReplaceAll(template, "*PROJECTS*", projectContext)
 
 	// Add area/interest context
+	areasinterests, err := FetchAreasInterests(nil)
+	if err != nil {
+		return "", err
+	}
+
+	areainterestContext := ""
+	for _, areasinterest := range areasinterests {
+		areainterestContext = areainterestContext + fmt.Sprintf("\n\t - %s: %s", areasinterest.Properties.Name.Title[0].Text, areasinterest.ID)
+	}
+
+	template = strings.ReplaceAll(template, "*AREAS*", areainterestContext)
 
 	log.Println(template)
 
