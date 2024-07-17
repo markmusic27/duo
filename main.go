@@ -3,8 +3,9 @@ package main
 import (
 	"log"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	process "github.com/markmusic27/workspace/utils"
+	"github.com/markmusic27/workspace/handlers"
 )
 
 func main() {
@@ -16,28 +17,20 @@ func main() {
 		return
 	}
 
-	id, err := process.IngestNote("What if we could use potential energy from gravitation as a renewable resource")
-
-	if err != nil {
-		log.Println(err)
-	}
-
-	log.Println(id)
-
 	// Setup API
-	// api := gin.Default()
+	api := gin.Default()
 
-	// const port = "8080"
+	const port = "8080"
 
-	// api.GET("/ping", func(c *gin.Context) {
-	// 	c.JSON(200, gin.H{
-	// 		"message": "pong",
-	// 	})
-	// })
+	api.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
 
-	// api.POST("/sms", handlers.InboundSMSRequest)
-	// api.POST("/api", handlers.InboundHTTPRequest)
+	api.POST("/sms", handlers.InboundSMSRequest)
+	api.POST("/api", handlers.InboundHTTPRequest)
 
-	// log.Println("Starting server on port " + port)
-	// api.Run(":" + port)
+	log.Println("Starting server on port " + port)
+	api.Run(":" + port)
 }

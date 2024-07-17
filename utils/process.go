@@ -23,7 +23,13 @@ func Process(message string, from string) error {
 
 		Message(from, SuccessMessage)
 	case "note":
-		// Handle note details
+		_, err := IngestNote(message)
+
+		if err != nil {
+			return err
+		}
+
+		Message(from, SuccessMessage)
 	default:
 		return fmt.Errorf("did not identify message type")
 	}
