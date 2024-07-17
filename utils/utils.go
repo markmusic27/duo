@@ -16,3 +16,7 @@ func RemoveNewline(input string) string {
 	result = strings.ReplaceAll(result, "\r", "")
 	return result
 }
+
+func RemoveIndex(slice []string, s int) []string {
+	return append(slice[:s], slice[s+1:]...)
+}

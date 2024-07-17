@@ -1,6 +1,6 @@
 module github.com/markmusic27/workspace
 
-go 1.19
+go 1.20
 
 require (
 	cloud.google.com/go/auth v0.7.0 // indirect

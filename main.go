@@ -28,6 +28,8 @@ func main() {
 		})
 	})
 
+	api.GET("/env", handlers.VerifyEnv)
+
 	api.POST("/sms", handlers.InboundSMSRequest)
 	api.POST("/api", handlers.InboundHTTPRequest)
 

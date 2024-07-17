@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -10,6 +11,46 @@ import (
 
 func InboundHTTPRequest(c *gin.Context) {
 	//TODO: Replace the logic with the HTTP logic
+}
+
+func VerifyEnv(c *gin.Context) {
+	envs := []string{
+		"PHONES",
+		"OPENAI",
+		"NOTION",
+		"COURSEID",
+		"TASKID",
+		"PROJECTID",
+		"AREAINTERESTID",
+		"NOTESID",
+		"TWILIO_ACCOUNT_SID",
+		"TWILIO_AUTH_TOKEN",
+		"TWILIO_PHONE",
+		"GCP_KEY",
+	}
+
+	missing := []string{}
+
+	for _, key := range envs {
+		value := os.Getenv(key)
+
+		if len(value) == 0 {
+			missing = append(missing, key)
+		}
+	}
+
+	if len(missing) == 0 {
+		c.JSON(200, gin.H{
+			"message": "All ENVs are loaded",
+		})
+
+		return
+	}
+
+	c.JSON(400, gin.H{
+		"error": fmt.Sprintf("Error: The following ENVs have not been found: %s", missing),
+	})
+
 }
 
 func InboundSMSRequest(c *gin.Context) {
