@@ -16,11 +16,13 @@ func main() {
 		return
 	}
 
-	_, err = process.IngestNote("https://alistair.sh/ interesting website add workout project")
+	id, err := process.IngestNote("What if we could use potential energy from gravitation as a renewable resource")
 
 	if err != nil {
 		log.Println(err)
 	}
+
+	log.Println(id)
 
 	// Setup API
 	// api := gin.Default()

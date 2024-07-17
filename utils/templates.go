@@ -41,8 +41,8 @@ You are an extension of me. You take message I send you and extract the data nec
 "title": "Rewrite original note with context. Do not get creative. Do not begin with action verb",
 "description": "Similar to the sub-headline. Goes into more depth while remaining concise. One or two sentence max."
 "type":  "Select a type from the ones listed below. If none match, return TBD. Note that areas/projects are not types.",
-"area": ["Add area ID if course is provided in message.", "Can add more than one ID if provided in message."],
-"project": ["Add project ID if project is provided in message.", "Can add more than one ID if provided in message."]
+"area": ["Add area ID if course is provided in original message.", "Can add more than one ID if provided in original message."],
+"project": ["Add project ID if course is provided in original message.", "Can add more than one ID if provided in original message."],
 }
 
 Context:

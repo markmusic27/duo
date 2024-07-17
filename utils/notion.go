@@ -39,7 +39,13 @@ type StatusFilter struct {
 type Child struct {
 	Object    string    `json:"object"`
 	Type      string    `json:"type"`
-	Paragraph *PageText `json:"paragraph"`
+	Paragraph *PageText `json:"paragraph,omitempty"`
+	Bookmark  *Bookmark `json:"bookmark,omitempty"`
+}
+
+type Bookmark struct {
+	Caption []string `json:"caption"`
+	URL     string   `json:"url"`
 }
 
 type PageText struct {
@@ -85,6 +91,18 @@ type WebsiteProp struct {
 
 type TextProp struct {
 	Tokens []Token `json:"rich_text"`
+}
+
+type RichText struct {
+	Components []RichTextComponent `json:"rich_text"`
+}
+
+type TextContent struct {
+	Content string `json:"content"`
+}
+
+type RichTextComponent struct {
+	Text TextContent `json:"text"`
 }
 
 type Token struct {
@@ -257,6 +275,21 @@ type AreaInterestProps struct {
 	Name NameProp `json:"Name"`
 }
 
+type Note struct {
+	Parent     ParentDatabase `json:"parent"`
+	Icon       Icon           `json:"icon"`
+	Properties NoteProperties `json:"properties"`
+	Children   []Child        `json:"children"`
+}
+
+type NoteProperties struct {
+	Name         NameWriteProp `json:"Name"`
+	Type         SelectProp    `json:"Type"`
+	AreaInterest RelationProp  `json:"Area / Interest"`
+	Description  RichText      `json:"Description"`
+	Project      RelationProp  `json:"Project"`
+}
+
 func FetchAreasInterests(filter *Filter) ([]AreaInterest, error) {
 	requestBody := DatabaseQueryBody{
 		Filter: filter,
@@ -303,6 +336,48 @@ func FetchAreasInterests(filter *Filter) ([]AreaInterest, error) {
 	}
 
 	return response.AreasInterests, nil
+}
+
+func CreateNote(note Note) (string, error) {
+	jsonData, err := json.Marshal(note)
+
+	if err != nil {
+		return "", err
+	}
+
+	req, err := http.NewRequest("POST", NotionPageCreationEndpoint, bytes.NewBuffer(jsonData))
+
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Notion-Version", "2022-06-28")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", os.Getenv("NOTION")))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// Read the response body
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	// Unmarshall body
+	var page Page
+	err = json.Unmarshal(body, &page)
+
+	if err != nil {
+		return "", fmt.Errorf("Failed to create page: " + err.Error() + "\n\nNotion Response:\n" + string(body))
+	}
+
+	return page.ID, nil
 }
 
 func FetchNoteTypes() ([]string, error) {

@@ -3,7 +3,6 @@ package process
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/url"
 	"os"
 	"strings"
@@ -202,19 +201,18 @@ func IngestNote(note string) (string, error) {
 	if len(urls) != 0 {
 		for i, urlI := range urls {
 			linkData, err := ChannelLink(urlI)
-			if err != nil {
-				return "", nil
+
+			if err == nil {
+				var newLine string
+
+				if i == 0 {
+					newLine = ""
+				} else {
+					newLine = "\n"
+				}
+
+				linkContext = linkContext + newLine + linkData
 			}
-
-			var newLine string
-
-			if i == 0 {
-				newLine = ""
-			} else {
-				newLine = "\n"
-			}
-
-			linkContext = linkContext + newLine + linkData
 		}
 	}
 
@@ -266,21 +264,87 @@ func IngestNote(note string) (string, error) {
 
 	template = strings.ReplaceAll(template, "*AREAS*", areainterestContext)
 
-	log.Println(template)
-
 	// Make request to OpenAI servers
 	userMessage := fmt.Sprintf("Original note: %s\n\n%s", message, linkContext)
-
-	log.Println(userMessage)
 
 	gen, err := Prompt(userMessage, template)
 	if err != nil {
 		return "", err
 	}
 
-	log.Println(gen)
+	var generated GeneratedNote
+	err = json.Unmarshal([]byte(CleanCode(gen)), &generated)
+	if err != nil {
+		return "", err
+	}
 
-	return "", nil
+	newNote := Note{
+		Parent: ParentDatabase{
+			Type:       "database_id",
+			DatabaseID: os.Getenv("NOTESID"),
+		},
+		Icon: Icon{
+			Type:  "emoji",
+			Emoji: generated.Emoji,
+		},
+		Properties: NoteProperties{
+			Name: NameWriteProp{
+				Title: []TokenWrite{
+					{
+						Text: TextWrite{
+							Content: generated.Title,
+						},
+					},
+				},
+			},
+			Type: SelectProp{
+				Select: Select{
+					Name: generated.Type,
+				},
+			},
+			Description: RichText{
+				Components: []RichTextComponent{
+					{
+						Text: TextContent{
+							Content: generated.Description,
+						},
+					},
+				},
+			},
+			AreaInterest: RelationProp{
+				Pages: GeneratePageFromStrings(generated.Area),
+			},
+			Project: RelationProp{
+				Pages: GeneratePageFromStrings(generated.Project),
+			},
+		},
+		Children: CreateBookmarksFromURLs(urls),
+	}
+
+	id, err := CreateNote(newNote)
+	if err != nil {
+		return "", err
+	}
+
+	return id, nil
+}
+
+func CreateBookmarksFromURLs(urls []string) []Child {
+	children := []Child{}
+
+	for _, url := range urls {
+		child := Child{
+			Object: "block",
+			Type:   "bookmark",
+			Bookmark: &Bookmark{
+				Caption: []string{},
+				URL:     url,
+			},
+		}
+		children = append(children, child)
+	}
+
+	return children
 }
 
 func ChannelLink(link string) (string, error) {
