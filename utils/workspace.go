@@ -186,11 +186,6 @@ func IngestTask(task string) (string, error) {
 
 // ⬇️ Notes
 
-type LinkContextResponse struct {
-	Message string   `json:"message"`
-	URLS    []string `json:"urls"`
-}
-
 type GeneratedNote struct {
 	Emoji       string   `json:"emoji"`
 	Title       string   `json:"title"`
@@ -201,20 +196,11 @@ type GeneratedNote struct {
 }
 
 func IngestNote(note string) (string, error) {
-	raw, err := Prompt(note, IngestNoteTemplate)
-	if err != nil {
-		return "", err
-	}
-
-	var data LinkContextResponse
-	err = json.Unmarshal([]byte(CleanCode(raw)), &data)
-	if err != nil {
-		return "", err
-	}
+	urls, message := ExtractLinksAndReplaceDomains(note)
 
 	linkContext := ""
-	if len(data.URLS) != 0 {
-		for i, urlI := range data.URLS {
+	if len(urls) != 0 {
+		for i, urlI := range urls {
 			linkData, err := ChannelLink(urlI)
 			if err != nil {
 				return "", nil
@@ -280,8 +266,12 @@ func IngestNote(note string) (string, error) {
 
 	template = strings.ReplaceAll(template, "*AREAS*", areainterestContext)
 
+	log.Println(template)
+
 	// Make request to OpenAI servers
-	userMessage := fmt.Sprintf("Original note: %s\n\n%s", data.Message, linkContext)
+	userMessage := fmt.Sprintf("Original note: %s\n\n%s", message, linkContext)
+
+	log.Println(userMessage)
 
 	gen, err := Prompt(userMessage, template)
 	if err != nil {

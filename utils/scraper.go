@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"regexp"
 	"strings"
 
 	md "github.com/JohannesKaufmann/html-to-markdown"
@@ -127,4 +128,31 @@ YouTube Video Context:
 	`, res.Items[0].Snippet.Title, res.Items[0].Snippet.ChannelTitle, RemoveNewline(ClampString(res.Items[0].Snippet.Description, 250)))
 
 	return data, nil
+}
+
+func ExtractLinksAndReplaceDomains(input string) (urls []string, message string) {
+	// Define the regex pattern to match URLs
+	urlPattern := `https?://[^\s]+`
+	re := regexp.MustCompile(urlPattern)
+
+	// Find all URLs in the input string
+	matches := re.FindAllString(input, -1)
+
+	// Store the modified message
+	message = input
+
+	// Replace each URL with its domain (without the TLD)
+	for i, url := range matches {
+		// Extract the domain
+		domainParts := strings.Split(strings.Split(url, "//")[1], ".")
+		domain := domainParts[0]
+
+		// Replace the URL in the message with the formatted text
+		message = strings.Replace(message, url, fmt.Sprintf("{%s link %d}", domain, i+1), 1)
+
+		// Add the URL to the urls slice
+		urls = append(urls, url)
+	}
+
+	return urls, message
 }
