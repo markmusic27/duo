@@ -71,13 +71,13 @@ func IngestTask(task string) (string, error) {
 	template = strings.ReplaceAll(template, "*WEEKDAY*", currentTime.Weekday().String())
 
 	// Add Course context
-	filter := &Filter{
+	courseFilter := &Filter{
 		Property: "Status",
 		Status: &StatusFilter{
 			Equals: "In progress",
 		},
 	}
-	courses, err := FetchCourses(filter)
+	courses, err := FetchCourses(courseFilter)
 
 	if err != nil {
 		return "", err
@@ -91,7 +91,13 @@ func IngestTask(task string) (string, error) {
 	template = strings.ReplaceAll(template, "*COURSES*", courseContext)
 
 	// Add Project context
-	projects, err := FetchProjects(filter)
+	projectFilter := &Filter{
+		Property: "Status",
+		Status: &StatusFilter{
+			Equals: "Active",
+		},
+	}
+	projects, err := FetchProjects(projectFilter)
 
 	if err != nil {
 		return "", err
@@ -235,7 +241,7 @@ func IngestNote(note string) (string, error) {
 	filter := &Filter{
 		Property: "Status",
 		Status: &StatusFilter{
-			Equals: "In progress",
+			Equals: "Active",
 		},
 	}
 	projects, err := FetchProjects(filter)
