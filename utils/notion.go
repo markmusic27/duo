@@ -335,7 +335,16 @@ func FetchAreasInterests(filter *Filter) ([]AreaInterest, error) {
 		return nil, err
 	}
 
-	return response.AreasInterests, nil
+	areas := response.AreasInterests
+
+	// Removes area of Capture from areas returned (prevents AI from adding them accidentally)
+	for i, area := range response.AreasInterests {
+		if area.Properties.Name.Title[0].Text == "Capture" {
+			areas = append(areas[:i], areas[i+1:]...)
+		}
+	}
+
+	return areas, nil
 }
 
 func CreateNote(note Note) (string, error) {

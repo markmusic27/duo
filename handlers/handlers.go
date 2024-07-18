@@ -50,7 +50,6 @@ func VerifyEnv(c *gin.Context) {
 	c.JSON(400, gin.H{
 		"error": fmt.Sprintf("Error: The following ENVs have not been found: %s", missing),
 	})
-
 }
 
 func InboundSMSRequest(c *gin.Context) {

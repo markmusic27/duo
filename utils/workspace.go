@@ -278,6 +278,10 @@ func IngestNote(note string) (string, error) {
 		return "", err
 	}
 
+	if len(generated.Area) == 0 && len(generated.Project) == 0 {
+		generated.Area = append(generated.Area, "4a42529d-7b44-46b5-b945-610acf1e3af9")
+	}
+
 	newNote := Note{
 		Parent: ParentDatabase{
 			Type:       "database_id",
