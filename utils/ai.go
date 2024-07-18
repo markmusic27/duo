@@ -33,12 +33,14 @@ type OAIResponseBody struct {
 // ⬇️ OpenAI Calls
 
 const OpenAIEndpoint = "https://api.openai.com/v1/chat/completions"
+const PrimaryModel = "gpt-4o"
+const SecondaryModel = "gpt-4o-mini"
 
 func Prompt(user string, system string, model ...string) (string, error) {
 	var selectedModel string
 
 	if len(model) == 0 {
-		selectedModel = "gpt-4o"
+		selectedModel = PrimaryModel
 	} else {
 		selectedModel = model[0]
 	}

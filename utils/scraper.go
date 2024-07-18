@@ -60,7 +60,7 @@ func ContextualizeLink(url string) (string, error) {
 		capped = body
 	}
 
-	summary, err := Prompt(capped, SummarizationTemplate, "gpt-3.5-turbo")
+	summary, err := Prompt(capped, SummarizationTemplate, SecondaryModel)
 
 	if err != nil {
 		return "", err

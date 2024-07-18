@@ -33,7 +33,7 @@ func GetType(message string) (string, error) {
 
 	template := strings.ReplaceAll(TypeTemplate, "*DB*", db)
 
-	raw, err := Prompt(message, template, "gpt-3.5-turbo")
+	raw, err := Prompt(message, template, SecondaryModel)
 
 	if err != nil {
 		return "", err
