@@ -79,6 +79,13 @@ func InboundSMSRequest(c *gin.Context) {
 	err := process.Process(c.PostForm("Body"), c.PostForm("From"))
 
 	if err != nil {
-		process.Message(c.PostForm("From"), process.TruncateString(err.Error()))
+		// Tries to process the message again
+		err = process.Process(c.PostForm("Body"), c.PostForm("From"))
+	}
+
+	// If the message still errored out
+	if err != nil {
+		process.Message(c.PostForm("From"), "Error: "+process.TruncateString(err.Error()))
+		return
 	}
 }
