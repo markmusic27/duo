@@ -1,1 +1,2 @@
 *.env
+/raycast/src/secret.ts
