@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 
@@ -11,6 +12,18 @@ import (
 
 func InboundHTTPRequest(c *gin.Context) {
 	//TODO: Replace the logic with the HTTP logic
+}
+
+func Authenticate() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token := c.GetHeader("Authorization")
+		if token != fmt.Sprintf("Bearer %s", os.Getenv("HTTP_KEY")) {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
 }
 
 func VerifyEnv(c *gin.Context) {
@@ -80,12 +93,6 @@ func InboundSMSRequest(c *gin.Context) {
 
 	if err != nil {
 		// Tries to process the message again
-		err = process.Process(c.PostForm("Body"), c.PostForm("From"))
-	}
-
-	// If the message still errored out
-	if err != nil {
 		process.Message(c.PostForm("From"), "Error: "+process.TruncateString(err.Error()))
-		return
 	}
 }

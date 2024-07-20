@@ -31,7 +31,7 @@ func main() {
 	api.GET("/env", handlers.VerifyEnv)
 
 	api.POST("/sms", handlers.InboundSMSRequest)
-	api.POST("/api", handlers.InboundHTTPRequest)
+	api.POST("/api", handlers.Authenticate(), handlers.InboundHTTPRequest)
 
 	log.Println("Starting server on port " + port)
 	api.Run(":" + port)
