@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -11,7 +12,7 @@ import (
 )
 
 func InboundHTTPRequest(c *gin.Context) {
-	//TODO: Replace the logic with the HTTP logic
+	log.Println("Worked")
 }
 
 func Authenticate() gin.HandlerFunc {
