@@ -126,6 +126,8 @@ func IngestTask(task string) (string, error) {
 
 	// Creates new task object based on information
 
+	emoji := string([]rune(generated.Emoji)[0])
+
 	newTask := Task{
 		Parent: ParentDatabase{
 			Type:       "database_id",
@@ -133,7 +135,7 @@ func IngestTask(task string) (string, error) {
 		},
 		Icon: Icon{
 			Type:  "emoji",
-			Emoji: generated.Emoji,
+			Emoji: emoji,
 		},
 		Properties: TaskProperties{
 			Name: NameWriteProp{
@@ -371,6 +373,7 @@ func ChannelLink(link string) (string, error) {
 		}
 
 		return data, nil
+
 	case "www.instagram.com", "instagram.com":
 		// TODO: Add Instagram API integration
 

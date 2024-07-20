@@ -4,35 +4,31 @@ import (
 	"fmt"
 )
 
-const SuccessMessage = "Logged ✅"
-
-func Process(message string, from string) error {
+func Process(message string) (string, error) {
 	mType, err := GetType(message)
 
 	if err != nil {
-		return err
+		return "", err
 	}
+
+	id := ""
 
 	switch mType {
 	case "task":
-		_, err := IngestTask(message)
+		id, err = IngestTask(message)
 
 		if err != nil {
-			return err
+			return "", err
 		}
-
-		Message(from, SuccessMessage)
 	case "note":
-		_, err := IngestNote(message)
+		id, err = IngestNote(message)
 
 		if err != nil {
-			return err
+			return "", err
 		}
-
-		Message(from, SuccessMessage)
 	default:
-		return fmt.Errorf("did not identify message type")
+		return "", fmt.Errorf("did not identify message type")
 	}
 
-	return nil
+	return id, nil
 }

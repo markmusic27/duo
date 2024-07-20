@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -10,10 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	process "github.com/markmusic27/workspace/utils"
 )
-
-func InboundHTTPRequest(c *gin.Context) {
-	log.Println("Worked")
-}
 
 func Authenticate() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -41,6 +36,7 @@ func VerifyEnv(c *gin.Context) {
 		"TWILIO_AUTH_TOKEN",
 		"TWILIO_PHONE",
 		"GCP_KEY",
+		"HTTP_KEY",
 	}
 
 	missing := []string{}
@@ -64,6 +60,10 @@ func VerifyEnv(c *gin.Context) {
 	c.JSON(400, gin.H{
 		"error": fmt.Sprintf("Error: The following ENVs have not been found: %s", missing),
 	})
+}
+
+func InboundHTTPRequest(c *gin.Context) {
+
 }
 
 func InboundSMSRequest(c *gin.Context) {
@@ -90,10 +90,11 @@ func InboundSMSRequest(c *gin.Context) {
 	})
 
 	// Add line to process
-	err := process.Process(c.PostForm("Body"), c.PostForm("From"))
+	_, err := process.Process(c.PostForm("Body"))
 
 	if err != nil {
-		// Tries to process the message again
 		process.Message(c.PostForm("From"), "Error: "+process.TruncateString(err.Error()))
+	} else {
+		process.Message(c.PostForm("From"), "Logged ✅")
 	}
 }
