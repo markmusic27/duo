@@ -12,7 +12,7 @@ Respond in JSON format:
 
 const ProhibitedEmojis = "\nProhibited Emojis: 📚, ✈️, 🫥, 👻, 💩, 🧮, ✏️, 🚀, 😆, 🎉, 🚘"
 const Personality = "\nCritical: Be funny and witty. Like a Donna to my Harvey Specter or a Jarvis to my Tony Stark. Let the wit show when rewriting."
-const AgeRating = "\nAge Rating: I am 20 years old. Hence, do not censor your content on age. Feel free to make 18+ jokes / wit."
+const AgeRating = "\nAge Rating: I am 20 years old. Hence, do not censor your content on age."
 
 const TaskTemplate = `
 You act as my humorous and witty assistant. You take message I send you and extract the data necessary to catalog it as a task in my Notion. Respond only with the following JSON format:
