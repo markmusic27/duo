@@ -6,6 +6,11 @@ interface CaptureProps {
   content: string;
 }
 
+interface ResponseData {
+  error: string | undefined;
+  message: string | undefined;
+}
+
 export default async function main(props: LaunchProps<{ arguments: CaptureProps }>) {
   const requestOptions = {
     method: "POST",
@@ -20,16 +25,17 @@ export default async function main(props: LaunchProps<{ arguments: CaptureProps 
 
   try {
     const res = await fetch(Endpoint, requestOptions);
+
+    if (res.ok) {
+      await showHUD("✅ Logged");
+      return;
+    }
+
     const data = await res.json();
+    const responseData = data as ResponseData;
 
-    console.log(data);
+    await showHUD(`🚨 Error: ${responseData.error}`);
   } catch (e) {
-    console.log(e);
+    await showHUD("🚨 Unable to send response");
   }
-
-  // console.log(res)
-
-  // const now = new Date();
-  // await Clipboard.copy(now.toLocaleDateString());
-  // await showHUD("Copied date to clipboard");
 }
