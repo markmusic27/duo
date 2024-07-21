@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func Process(message string) (string, error) {
+func Ingest(message string) (string, error) {
 	mType, err := GetType(message)
 
 	if err != nil {
@@ -31,4 +31,13 @@ func Process(message string) (string, error) {
 	}
 
 	return id, nil
+}
+
+func Process(message string) (string, error) {
+	id, err := Ingest(message)
+	if err != nil && len(id) == 0 {
+		// Retry once
+		id, err = Ingest(message)
+	}
+	return id, err
 }
