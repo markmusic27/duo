@@ -62,8 +62,37 @@ func VerifyEnv(c *gin.Context) {
 	})
 }
 
-func InboundHTTPRequest(c *gin.Context) {
+type APIResponse struct {
+	Message string `json:"message"`
+}
 
+func InboundHTTPRequest(c *gin.Context) {
+	var body APIResponse
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	if len(body.Message) == 0 {
+		c.JSON(400, gin.H{"error": fmt.Errorf("message is empty")})
+		return
+	}
+
+	// Add line to process
+	id, err := process.Process(body.Message)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	if len(id) == 0 {
+		c.JSON(400, gin.H{"error": fmt.Errorf("returned ID was empty")})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"id": id,
+	})
 }
 
 func InboundSMSRequest(c *gin.Context) {
