@@ -52,10 +52,13 @@ func GetType(message string) (string, error) {
 
 // ⬇️ Tasks
 
+type GeneratedDeadline struct {
+	Deadline string `json:"deadline"`
+}
+
 type GeneratedTask struct {
 	Emoji    string   `json:"emoji"`
 	Task     string   `json:"task"`
-	Deadline string   `json:"deadline"`
 	Priority int64    `json:"priority"`
 	Body     string   `json:"body"`
 	Course   []string `json:"course"`
@@ -108,6 +111,21 @@ func IngestTask(task string) (string, error) {
 		projectContext = projectContext + fmt.Sprintf("\n\t - %s: %s", project.Properties.Name.Title[0].Text, project.ID)
 	}
 
+	// Obtain deadline and priority
+	deadlineTemplate := strings.ReplaceAll(DeadlineTemplate, "*DATE*", currentTime.Format(time.RFC3339))
+	deadlineTemplate = strings.ReplaceAll(deadlineTemplate, "*WEEKDAY*", currentTime.Weekday().String())
+
+	deadlineRes, err := Prompt(task, deadlineTemplate)
+	if err != nil {
+		return "", err
+	}
+
+	var generatedDeadline GeneratedDeadline
+	err = json.Unmarshal([]byte(CleanCode(deadlineRes)), &generatedDeadline)
+	if err != nil {
+		return "", err
+	}
+
 	template = strings.ReplaceAll(template, "*PROJECTS*", projectContext)
 
 	// Send request to OpenAI
@@ -154,7 +172,7 @@ func IngestTask(task string) (string, error) {
 			},
 			DueDate: DateProp{
 				Date: Date{
-					Start: generated.Deadline,
+					Start: generatedDeadline.Deadline,
 				},
 			},
 			Course: RelationProp{
