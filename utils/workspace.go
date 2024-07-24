@@ -68,8 +68,15 @@ type GeneratedTask struct {
 func IngestTask(task string) (string, error) {
 	template := TaskTemplate
 
+	// Loads the adequate
+	location, err := time.LoadLocation(os.Getenv("LOCATION"))
+	if err != nil {
+		return "", err
+	}
+
 	// Add date information
-	currentTime := time.Now()
+	t := time.Now()
+	currentTime := t.In(location)
 	template = strings.ReplaceAll(template, "*DATE*", currentTime.Format(time.RFC3339))
 	template = strings.ReplaceAll(template, "*WEEKDAY*", currentTime.Weekday().String())
 
@@ -114,6 +121,13 @@ func IngestTask(task string) (string, error) {
 	// Obtain deadline and priority
 	deadlineTemplate := strings.ReplaceAll(DeadlineTemplate, "*DATE*", currentTime.Format(time.RFC3339))
 	deadlineTemplate = strings.ReplaceAll(deadlineTemplate, "*WEEKDAY*", currentTime.Weekday().String())
+
+	timezone, err := ExtractTimezone(currentTime.Format(time.RFC3339))
+	if err != nil {
+		return "", err
+	}
+
+	deadlineTemplate = strings.ReplaceAll(deadlineTemplate, "*TIMEZONE*", timezone)
 
 	deadlineRes, err := Prompt(task, deadlineTemplate)
 	if err != nil {

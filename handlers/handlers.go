@@ -37,6 +37,8 @@ func VerifyEnv(c *gin.Context) {
 		"TWILIO_PHONE",
 		"GCP_KEY",
 		"HTTP_KEY",
+		"LOCATION",
+		"COURSE_PAGE_ID",
 	}
 
 	missing := []string{}
@@ -51,7 +53,7 @@ func VerifyEnv(c *gin.Context) {
 
 	if len(missing) == 0 {
 		c.JSON(200, gin.H{
-			"message": "All ENVs are loaded",
+			"message": "All of the environment variables have been loaded",
 		})
 
 		return

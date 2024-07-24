@@ -26,6 +26,7 @@ Respond only with the following JSON format:
 Context:
 - Date message was sent in ISO-8601: "*DATE*"
 - Day of week when message was sent: *WEEKDAY*
+- Sent from / in the context of UTC *TIMEZONE*. The deadline MUST be in the same timezone.
 `
 
 const TaskTemplate = `
