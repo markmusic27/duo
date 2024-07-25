@@ -29,6 +29,23 @@ Context:
 - Sent from / in the context of UTC *TIMEZONE*. The deadline MUST be in the same timezone.
 `
 
+const TimezoneTemplate = `
+You convert user-specified locations into IANA timezone strings. Recognize common names and abbreviations, and return the correct timezone.  Respond in following JSON format:
+
+{
+"timezone": "IANA timezone string"
+"error": "Could not find timezone (only add if necessary. If not necessary, don't add error line)"
+}
+
+Examples:
+Input: "SF" / "San Francisco"
+Output: "America/Los_Angeles"
+Input: "Costa Rica"
+Output: "America/Costa_Rica"
+Input: "Unknown Location"
+Output: "Could not find timezone"
+`
+
 const TaskTemplate = `
 You act as my humorous and witty assistant. You take message I send you and extract the data necessary to catalog it as a task in my Notion. Respond only with the following JSON format:
 

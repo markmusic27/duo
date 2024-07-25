@@ -22,6 +22,41 @@ func Authenticate() gin.HandlerFunc {
 	}
 }
 
+type UpdateTimezoneResponse struct {
+	Location string `json:"location"`
+}
+
+func UpdateTimezone(c *gin.Context) {
+	var body UpdateTimezoneResponse
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	if len(body.Location) == 0 {
+		c.JSON(400, gin.H{"error": fmt.Errorf("timezone is empty")})
+		return
+	}
+
+	location, err := process.SetTimezoneFromLocation(body.Location)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": fmt.Sprintf("The timezone has been updated to %s", location),
+	})
+}
+
+func GetTimezone(c *gin.Context) {
+	timezone := os.Getenv("LOCATION")
+
+	c.JSON(200, gin.H{
+		"timezone": timezone,
+	})
+}
+
 func VerifyEnv(c *gin.Context) {
 	envs := []string{
 		"PHONES",

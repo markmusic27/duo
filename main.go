@@ -29,9 +29,11 @@ func main() {
 	})
 
 	api.GET("/env", handlers.VerifyEnv)
+	api.GET("/timezone", handlers.GetTimezone)
 
 	api.POST("/sms", handlers.InboundSMSRequest)
 	api.POST("/api", handlers.Authenticate(), handlers.InboundHTTPRequest)
+	api.POST("/set-timezone", handlers.Authenticate(), handlers.UpdateTimezone)
 
 	log.Println("Starting server on port " + port)
 	api.Run(":" + port)
