@@ -115,7 +115,7 @@ func InboundHTTPRequest(c *gin.Context) {
 		return
 	}
 
-	if strings.Contains(body.Message, "#UT:") {
+	if strings.Contains(body.Message, process.TimezonePrefix) {
 		location, err := process.ExtractLocationFromSMS(body.Message)
 		if err != nil {
 			c.JSON(400, gin.H{"error": fmt.Errorf("Error: Failed to extract location from string.\n" + err.Error())})
@@ -173,7 +173,7 @@ func InboundSMSRequest(c *gin.Context) {
 		"status": "Message is being processed!",
 	})
 
-	if strings.Contains(c.PostForm("Body"), "#UT:") {
+	if strings.Contains(c.PostForm("Body"), process.TimezonePrefix) {
 		location, err := process.ExtractLocationFromSMS(c.PostForm("Body"))
 		if err != nil {
 			process.Message(c.PostForm("From"), "Error: Failed to extract location from string.\n"+err.Error())

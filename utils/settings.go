@@ -47,7 +47,7 @@ func ValidateIANATimezone(iana string) (string, error) {
 }
 
 func ExtractLocationFromSMS(message string) (string, error) {
-	locationPrefix := "#UT:"
+	locationPrefix := TimezonePrefix
 
 	// Check if the message starts with the location prefix
 	if !strings.HasPrefix(message, locationPrefix) {
