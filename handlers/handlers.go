@@ -115,7 +115,25 @@ func InboundHTTPRequest(c *gin.Context) {
 		return
 	}
 
-	// Add line to process
+	if strings.Contains(body.Message, "#UT:") {
+		location, err := process.ExtractLocationFromSMS(body.Message)
+		if err != nil {
+			c.JSON(400, gin.H{"error": fmt.Errorf("Error: Failed to extract location from string.\n" + err.Error())})
+			return
+		}
+
+		iana, err := process.SetTimezoneFromLocation(location)
+		if err != nil {
+			c.JSON(400, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(200, gin.H{
+			"message": fmt.Sprintf("Updated timezone to %s", iana+" ✅"),
+		})
+		return
+	}
+
 	id, err := process.Process(body.Message)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
