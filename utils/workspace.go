@@ -65,7 +65,12 @@ type GeneratedTask struct {
 	Project  []string `json:"project"`
 }
 
-func IngestTask(task string) (string, error) {
+func IngestTask(task string, instructions ...string) (string, error) {
+	var instruction string
+	if len(instructions) > 0 {
+		instruction = instructions[0]
+	}
+
 	template := TaskTemplate
 
 	// Loads the adequate
@@ -141,6 +146,11 @@ func IngestTask(task string) (string, error) {
 	}
 
 	template = strings.ReplaceAll(template, "*PROJECTS*", projectContext)
+
+	// Add instructions if necessary
+	if len(instruction) > 0 {
+		template = template + InstructionPreamble + instruction
+	}
 
 	// Send request to OpenAI
 	res, err := Prompt(task, template)
@@ -234,7 +244,12 @@ type GeneratedNote struct {
 	Project     []string `json:"project"`
 }
 
-func IngestNote(note string) (string, error) {
+func IngestNote(note string, instructions ...string) (string, error) {
+	var instruction string
+	if len(instructions) > 0 {
+		instruction = instructions[0]
+	}
+
 	urls, message := ExtractLinksAndReplaceDomains(note)
 
 	linkContext := ""
@@ -306,6 +321,11 @@ func IngestNote(note string) (string, error) {
 
 	// Make request to OpenAI servers
 	userMessage := fmt.Sprintf("Original note: %s\n\n%s", message, linkContext)
+
+	// Add instructions if necessary
+	if len(instruction) > 0 {
+		template = template + InstructionPreamble + instruction
+	}
 
 	gen, err := Prompt(userMessage, template)
 	if err != nil {

@@ -4,7 +4,12 @@ import (
 	"fmt"
 )
 
-func Ingest(message string) (string, error) {
+func Ingest(message string, instructions ...string) (string, error) {
+	var instruction string
+	if len(instructions) > 0 {
+		instruction = instructions[0]
+	}
+
 	mType, err := GetType(message)
 
 	if err != nil {
@@ -15,13 +20,13 @@ func Ingest(message string) (string, error) {
 
 	switch mType {
 	case "task":
-		id, err = IngestTask(message)
+		id, err = IngestTask(message, instruction)
 
 		if err != nil {
 			return "", err
 		}
 	case "note":
-		id, err = IngestNote(message)
+		id, err = IngestNote(message, instruction)
 
 		if err != nil {
 			return "", err
@@ -33,11 +38,16 @@ func Ingest(message string) (string, error) {
 	return id, nil
 }
 
-func Process(message string) (string, error) {
-	id, err := Ingest(message)
+func Process(message string, instructions ...string) (string, error) {
+	var instruction string
+	if len(instructions) > 0 {
+		instruction = instructions[0]
+	}
+
+	id, err := Ingest(message, instruction)
 	if err != nil && len(id) == 0 {
 		// Retry once
-		id, err = Ingest(message)
+		id, err = Ingest(message, instruction)
 	}
 	return id, err
 }

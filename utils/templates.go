@@ -46,6 +46,8 @@ Input: "Unknown Location"
 Output: "Could not find timezone"
 `
 
+const InstructionPreamble = "\n\nYou were also provided with these instructions from the user:\n"
+
 const TaskTemplate = `
 You act as my humorous and witty assistant. You take message I send you and extract the data necessary to catalog it as a task in my Notion. Respond only with the following JSON format:
 

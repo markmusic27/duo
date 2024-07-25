@@ -115,6 +115,7 @@ func InboundHTTPRequest(c *gin.Context) {
 		return
 	}
 
+	// System Keys
 	if strings.Contains(body.Message, process.TimezonePrefix) {
 		location, err := process.ExtractLocationFromSMS(body.Message)
 		if err != nil {
@@ -134,7 +135,19 @@ func InboundHTTPRequest(c *gin.Context) {
 		return
 	}
 
-	id, err := process.Process(body.Message)
+	var instruction string
+
+	if strings.Contains(body.Message, process.SystemPrefix) {
+		instr, err := process.ExtractSystemContent(body.Message)
+		if err != nil {
+			instruction = ""
+		} else {
+			instruction = instr
+		}
+	}
+	// Process Message
+
+	id, err := process.Process(process.RemoveInstruction(body.Message), instruction)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
@@ -173,6 +186,8 @@ func InboundSMSRequest(c *gin.Context) {
 		"status": "Message is being processed!",
 	})
 
+	// System Keys
+
 	if strings.Contains(c.PostForm("Body"), process.TimezonePrefix) {
 		location, err := process.ExtractLocationFromSMS(c.PostForm("Body"))
 		if err != nil {
@@ -190,7 +205,7 @@ func InboundSMSRequest(c *gin.Context) {
 		return
 	}
 
-	// Add line to process
+	// Process Message
 	_, err := process.Process(c.PostForm("Body"))
 
 	if err != nil {

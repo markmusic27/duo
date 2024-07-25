@@ -61,3 +61,38 @@ func ExtractLocationFromSMS(message string) (string, error) {
 
 	return location, nil
 }
+
+func ExtractSystemContent(message string) (string, error) {
+	startIndex := strings.Index(message, SystemPrefix)
+	if startIndex == -1 {
+		return "", fmt.Errorf("no instructions found")
+	}
+
+	startIndex += len(SystemPrefix)
+
+	instructions := strings.TrimSpace(message[startIndex:])
+	return instructions, nil
+}
+
+func RemoveInstruction(message string) string {
+	const systemPrefix = SystemPrefix
+
+	// Check if the message contains the system prefix
+	if !strings.Contains(message, systemPrefix) {
+		return message // No instruction to remove
+	}
+
+	// Find the position of the system prefix
+	prefixIndex := strings.Index(message, systemPrefix)
+	if prefixIndex == -1 {
+		return message // Prefix not found
+	}
+
+	// Extract the part of the message before the system prefix
+	cleanMessage := message[:prefixIndex]
+
+	// Trim any trailing spaces before the prefix
+	cleanMessage = strings.TrimSpace(cleanMessage)
+
+	return cleanMessage
+}
