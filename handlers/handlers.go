@@ -155,6 +155,23 @@ func InboundSMSRequest(c *gin.Context) {
 		"status": "Message is being processed!",
 	})
 
+	if strings.Contains(c.PostForm("Body"), "#UT:") {
+		location, err := process.ExtractLocationFromSMS(c.PostForm("Body"))
+		if err != nil {
+			process.Message(c.PostForm("From"), "Error: Failed to extract location from string.\n"+err.Error())
+			return
+		}
+
+		iana, err := process.SetTimezoneFromLocation(location)
+		if err != nil {
+			process.Message(c.PostForm("From"), "Error: "+err.Error())
+			return
+		}
+
+		process.Message(c.PostForm("From"), fmt.Sprintf("Updated timezone to %s", iana+" ✅"))
+		return
+	}
+
 	// Add line to process
 	_, err := process.Process(c.PostForm("Body"))
 

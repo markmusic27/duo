@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -43,4 +44,20 @@ func ValidateIANATimezone(iana string) (string, error) {
 		return "", fmt.Errorf("invalid IANA timezone string: %s", iana)
 	}
 	return iana, nil
+}
+
+func ExtractLocationFromSMS(message string) (string, error) {
+	locationPrefix := "#UT:"
+
+	// Check if the message starts with the location prefix
+	if !strings.HasPrefix(message, locationPrefix) {
+		return "", fmt.Errorf("message does not contain the location prefix: %s", locationPrefix)
+	}
+
+	// Extract the location by trimming the prefix
+	location := strings.TrimPrefix(message, locationPrefix)
+	// Trim any leading spaces that might follow the prefix
+	location = strings.TrimSpace(location)
+
+	return location, nil
 }
