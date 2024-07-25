@@ -7,8 +7,8 @@ interface CaptureProps {
 }
 
 interface ResponseData {
-  error: string | undefined;
-  message: string | undefined;
+  error?: string;
+  message?: string;
 }
 
 export default async function main(props: LaunchProps<{ arguments: CaptureProps }>) {
@@ -27,7 +27,16 @@ export default async function main(props: LaunchProps<{ arguments: CaptureProps 
     const res = await fetch(Endpoint, requestOptions);
 
     if (res.ok) {
-      await showHUD("✅ Logged");
+      const data = await res.json();
+      const responseData = data as ResponseData;
+
+      if (responseData.message == null) {
+        await showHUD("✅ Logged");
+
+        return;
+      }
+
+      await showHUD(responseData.message);
       return;
     }
 
