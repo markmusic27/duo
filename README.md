@@ -4,7 +4,7 @@
   </a>
   <h1 align="center"><b>workspace ai</b></h1>
   <p align="center">
-  ✶ A LLM extension of my workspace hosted on Notion ✶
+  ✶ An LLM extension of my workspace hosted on Notion ✶
     <br />
     <a href="https://api.markmusic.io">Explore Workspace AI »</a>
     <br />
