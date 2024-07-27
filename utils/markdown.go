@@ -28,17 +28,14 @@ type MarkdownRichText struct {
 }
 
 func ConvertMarkdownToNotion(markdown string) ([]Block, error) {
-	lines := splitMarkdownLines(markdown)
+	lines := strings.Split(markdown, "\n")
+	lines = RemoveEmptyLines(lines)
 	var blocks []Block
 
 	// Code block elemenets
 	inCodeBlock := false
 	var language strings.Builder
 	var code strings.Builder
-
-	// Block equation elements
-	inEquationBlock := false
-	var equation strings.Builder
 
 	for _, line := range lines {
 		// Handle addition of code block
@@ -60,23 +57,6 @@ func ConvertMarkdownToNotion(markdown string) ([]Block, error) {
 			code.WriteString(indent + line)
 		}
 
-		// Handle addition of equation
-		if !inEquationBlock && (line == "$$") {
-			inEquationBlock = true
-		} else if inEquationBlock && (line == "$$") {
-			// Append the equation block to the list
-			blocks = append(blocks, createEquationBlock(equation.String()))
-
-			inEquationBlock = false
-			equation.Reset()
-		} else {
-			indent := "\\"
-			if len(equation.String()) == 0 {
-				indent = ""
-			}
-			equation.WriteString(indent + line)
-		}
-
 		// Handle addition of single line blocks
 		switch {
 		case strings.HasPrefix(line, "# "):
@@ -85,8 +65,6 @@ func ConvertMarkdownToNotion(markdown string) ([]Block, error) {
 			blocks = append(blocks, createHeading2Block(line[3:]))
 		case strings.HasPrefix(line, "### "):
 			blocks = append(blocks, createHeading3Block(line[4:]))
-		case strings.HasPrefix(line, "*EQKEY*"):
-			blocks = append(blocks, createEquationBlock(line[7:]))
 		case strings.HasPrefix(line, "- ") && !strings.HasPrefix(line, "- [ ") && !strings.HasPrefix(line, "- [x"):
 			blocks = append(blocks, createBulletList(line[2:]))
 		case validateNumberedList(line):
@@ -166,23 +144,6 @@ func createBulletList(item string) Block {
 		Type:   "bulleted_list_item",
 		Bullets: &map[string]interface{}{
 			"rich_text": createRichText(item),
-		},
-	}
-}
-
-func createEquationBlock(equation string) Block {
-	return Block{
-		Object: "block",
-		Type:   "paragraph",
-		Paragraph: &map[string]interface{}{
-			"rich_text": []MarkdownRichText{
-				{
-					Type: "equation",
-					Equation: &map[string]interface{}{
-						"expression": equation,
-					},
-				},
-			},
 		},
 	}
 }
@@ -296,91 +257,6 @@ func createHeading3Block(line string) Block {
 			"color":         "default",
 		},
 	}
-}
-
-const EquationKey = "*EQKEY*"
-
-func splitMarkdownLines(markdown string) []string {
-	var lines []string
-	var equation strings.Builder
-	var line strings.Builder
-
-	inEquation := false
-	currentSect := -1
-	historicalSect := []int{}
-	prohibited := -1
-
-	for i := 0; i < len(markdown); i++ {
-		if i+1 != len(markdown) {
-			sect := string(markdown[i]) + string(markdown[i+1])
-
-			if sect == "$$" && !inEquation {
-				// Start of equation
-				inEquation = true
-				currentSect = i
-				historicalSect = append(historicalSect, currentSect)
-
-				// Check if line is pending to be added
-				if len(line.String()) != 0 {
-					lines = append(lines, line.String())
-					line.Reset()
-				}
-
-			} else if sect == "$$" && inEquation {
-				// End of equation
-				inEquation = false
-				currentSect = -1
-				historicalSect = append(historicalSect, i)
-
-				// Append Equation
-				lines = append(lines, EquationKey+equation.String())
-				equation.Reset()
-
-			} else if inEquation && (i != currentSect && i != currentSect+1) {
-				equation.WriteString(string(markdown[i]))
-			} else if (i != currentSect) && (i != currentSect+1) {
-				if string(markdown[i]) == "$" {
-					for _, h := range historicalSect {
-						if h+1 == i {
-							prohibited = i
-						}
-					}
-				}
-
-				if prohibited != i {
-					line.WriteString(string(markdown[i]))
-				}
-			}
-		}
-	}
-
-	if len(line.String()) != 0 {
-		lines = append(lines, line.String())
-	}
-
-	for i, l := range lines {
-		if !strings.Contains(l, EquationKey) {
-			segregated := strings.Split(l, "\n")
-			segregated = RemoveEmptyLines(segregated)
-
-			lines = append(lines[:i], append(segregated, lines[i+1:]...)...)
-		} else {
-			if strings.Contains(l, "\n") {
-				lines[IndexOf(lines, l)] = strings.ReplaceAll(l, "\n", "")
-			}
-		}
-	}
-
-	// Checks if a first order extremity characters needs to be reversed
-	if !strings.Contains(lines[0], EquationKey) {
-		lines[0] = string(markdown[0]) + lines[0]
-	}
-
-	if !strings.Contains(lines[len(lines)-1], EquationKey) {
-		lines[len(lines)-1] = lines[len(lines)-1] + string(markdown[len(markdown)-1])
-	}
-
-	return lines
 }
 
 type FormattedText struct {
