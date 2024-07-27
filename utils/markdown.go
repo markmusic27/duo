@@ -69,11 +69,10 @@ func ConvertMarkdownToNotion(markdown string) ([]Block, error) {
 		case (strings.HasPrefix(line, "- ") || strings.HasPrefix(line, "  - ")) && !strings.HasPrefix(line, "- [ ") && !strings.HasPrefix(line, "- [x"):
 			index := strings.Index(line, "-")
 			if index != -1 {
-				blocks = append(blocks, createBulletList(line[index:]))
+				blocks = append(blocks, createBulletList(line[index+1:]))
 			} else {
 				blocks = append(blocks, createBulletList(line[2:]))
 			}
-
 		case validateNumberedList(line):
 			blocks = append(blocks, createNumberedList(line))
 		case strings.HasPrefix(line, "- [ ]"):
