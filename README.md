@@ -28,11 +28,11 @@ With Workspace AI, you can:
 - **Humor Mode:** Enable a humor setting to get a daily dose of AI-generated wit and wisdom.
 - **Contextualize Links & Videos:** Automatically contextualize links and YouTube videos, providing summaries and insights.
 
-# Motivation
+## Motivation
 
 Workspace AI was born out of the need for a smarter, more integrated way to manage tasks and notes. Whether you're juggling multiple projects or simply trying to keep your personal life organized, Workspace AI aims to make your life easier and more enjoyable.
 
-# Technical Overview
+## Technical Overview
 
 Workspace AI leverages a robust backend to ensure smooth and reliable performance. The core functionalities include:
 
