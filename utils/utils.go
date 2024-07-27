@@ -78,7 +78,11 @@ func RemoveEmptyStrings(slice []string) []string {
 func RemoveEmptyLines(lines []string) []string {
 	var filtered []string
 	for _, line := range lines {
-		trimmedLine := strings.TrimSpace(line)
+		// Remove all spaces, tabs, etc.
+		trimmedLine := strings.ReplaceAll(line, " ", "")
+		trimmedLine = strings.ReplaceAll(trimmedLine, "\t", "")
+
+		// Filter out empty lines
 		if trimmedLine != "" {
 			filtered = append(filtered, line)
 		}

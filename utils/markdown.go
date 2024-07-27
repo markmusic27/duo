@@ -30,6 +30,7 @@ type MarkdownRichText struct {
 func ConvertMarkdownToNotion(markdown string) ([]Block, error) {
 	lines := strings.Split(markdown, "\n")
 	lines = RemoveEmptyLines(lines)
+
 	var blocks []Block
 
 	// Code block elemenets
