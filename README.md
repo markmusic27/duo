@@ -1,12 +1,12 @@
 <p align="center">
   <a href="#">
-    <img width="125" height="125" src="https://i.ibb.co/GsGkTys/workspace-ai-icon.png" alt="Logo">
+    <img width="160" height="160" src="https://i.ibb.co/GsGkTys/workspace-ai-icon.png" alt="Logo">
   </a>
   <h1 align="center"><b>Workspace AI</b></h1>
   <p align="center">
   ✶ A LLM extension of my workspace hosted on Notion ✶
     <br />
-    <a href="https://api.markmusic.io"><strong>Explore Workspace AI »</strong></a>
+    <a href="https://api.markmusic.io">Explore Workspace AI »</a>
     <br />
     <br />
     <b>Available for </b>
