@@ -3,7 +3,6 @@ package process
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/url"
 	"os"
 	"strings"
@@ -391,8 +390,6 @@ func CreateBookmarksFromURLs(urls []string) []Block {
 	for _, url := range urls {
 		markdown.WriteString(fmt.Sprintf("\n- [%s](%s)", url, url))
 	}
-
-	log.Println(markdown.String())
 
 	b, err := ConvertMarkdownToNotion(markdown.String())
 	if err != nil {
