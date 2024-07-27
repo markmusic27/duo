@@ -3,6 +3,7 @@ package process
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/url"
 	"os"
 	"strings"
@@ -169,6 +170,10 @@ func IngestTask(task string, instructions ...string) (string, error) {
 	// Creates new task object based on information
 
 	emoji := string([]rune(generated.Emoji)[0])
+	body, err := ConvertMarkdownToNotion(generated.Body)
+	if err != nil {
+		return "", nil
+	}
 
 	newTask := Task{
 		Parent: ParentDatabase{
@@ -206,22 +211,7 @@ func IngestTask(task string, instructions ...string) (string, error) {
 				Pages: GeneratePageFromStrings(generated.Project),
 			},
 		},
-		Children: []Child{
-			{
-				Object: "block",
-				Type:   "paragraph",
-				Paragraph: &PageText{
-					Tokens: []PageToken{
-						{
-							Type: "text",
-							Text: TextWrite{
-								Content: generated.Body,
-							},
-						},
-					},
-				},
-			},
-		},
+		Children: body,
 	}
 
 	id, err := CreateTask(newTask)
@@ -393,22 +383,23 @@ func IngestNote(note string, instructions ...string) (string, error) {
 	return id, nil
 }
 
-func CreateBookmarksFromURLs(urls []string) []Child {
-	children := []Child{}
+func CreateBookmarksFromURLs(urls []string) []Block {
+	var markdown strings.Builder
+
+	markdown.WriteString("### Resources")
 
 	for _, url := range urls {
-		child := Child{
-			Object: "block",
-			Type:   "bookmark",
-			Bookmark: &Bookmark{
-				Caption: []string{},
-				URL:     url,
-			},
-		}
-		children = append(children, child)
+		markdown.WriteString(fmt.Sprintf("\n- [%s](%s)", url, url))
 	}
 
-	return children
+	log.Println(markdown.String())
+
+	b, err := ConvertMarkdownToNotion(markdown.String())
+	if err != nil {
+		b = []Block{}
+	}
+
+	return b
 }
 
 func ChannelLink(link string) (string, error) {

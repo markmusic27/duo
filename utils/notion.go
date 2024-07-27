@@ -36,18 +36,6 @@ type StatusFilter struct {
 
 // ⬇️ General Props
 
-type Child struct {
-	Object    string    `json:"object"`
-	Type      string    `json:"type"`
-	Paragraph *PageText `json:"paragraph,omitempty"`
-	Bookmark  *Bookmark `json:"bookmark,omitempty"`
-}
-
-type Bookmark struct {
-	Caption []string `json:"caption"`
-	URL     string   `json:"url"`
-}
-
 type PageText struct {
 	Tokens []PageToken `json:"rich_text"`
 }
@@ -279,7 +267,7 @@ type Note struct {
 	Parent     ParentDatabase `json:"parent"`
 	Icon       Icon           `json:"icon"`
 	Properties NoteProperties `json:"properties"`
-	Children   []Child        `json:"children"`
+	Children   []Block        `json:"children"`
 }
 
 type NoteProperties struct {
@@ -467,7 +455,7 @@ type Task struct {
 	Parent     ParentDatabase `json:"parent"`
 	Icon       Icon           `json:"icon"`
 	Properties TaskProperties `json:"properties"`
-	Children   []Child        `json:"children"`
+	Children   []Block        `json:"children"`
 }
 
 type ParentDatabase struct {

@@ -2,6 +2,7 @@ package process
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -57,4 +58,44 @@ func ExtractTimezone(dateStr string) (string, error) {
 	timezoneWithDirection := fmt.Sprintf("%s (i.e., %s)", timezone, direction)
 
 	return timezoneWithDirection, nil
+}
+
+func RemoveEmptyStrings(slice []string) []string {
+	// Create a new slice to hold non-empty strings
+	result := []string{}
+
+	// Iterate over the original slice
+	for _, str := range slice {
+		if str != "" {
+			// Append non-empty strings to the result slice
+			result = append(result, str)
+		}
+	}
+
+	return result
+}
+
+func RemoveEmptyLines(lines []string) []string {
+	var filtered []string
+	for _, line := range lines {
+		trimmedLine := strings.TrimSpace(line)
+		if trimmedLine != "" {
+			filtered = append(filtered, line)
+		}
+	}
+	return filtered
+}
+
+func IndexOf(slice []string, item string) int {
+	for i, v := range slice {
+		if v == item {
+			return i
+		}
+	}
+	return -1 // Item not found
+}
+
+func IsNumber(s string) bool {
+	_, err := strconv.Atoi(s)
+	return err == nil
 }
