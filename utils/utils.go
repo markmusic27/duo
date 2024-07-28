@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
 )
 
 func ClampString(input string, clamp int) string {
@@ -73,6 +74,10 @@ func RemoveEmptyStrings(slice []string) []string {
 	}
 
 	return result
+}
+
+func RemoveLeadingWhitespace(input string) string {
+	return strings.TrimLeftFunc(input, unicode.IsSpace)
 }
 
 func RemoveEmptyLines(lines []string) []string {
