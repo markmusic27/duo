@@ -164,7 +164,7 @@ func createParagraph(paragraph string) Block {
 }
 
 func createRichText(paragraph string) []MarkdownRichText {
-	components := formatMarkdownParagraph(paragraph)
+	components := FormatMarkdownParagraph(paragraph)
 	text := []MarkdownRichText{}
 
 	for _, component := range components {
@@ -183,6 +183,7 @@ func createRichText(paragraph string) []MarkdownRichText {
 		isBold := false
 		isStrikethrough := false
 		isItalic := false
+		isCode := false
 
 		switch component.Format {
 		case "B":
@@ -191,6 +192,8 @@ func createRichText(paragraph string) []MarkdownRichText {
 			isItalic = true
 		case "S":
 			isStrikethrough = true
+		case "C":
+			isCode = true
 		}
 
 		text = append(text, MarkdownRichText{
@@ -201,7 +204,7 @@ func createRichText(paragraph string) []MarkdownRichText {
 				"italic":        isItalic,
 				"strikethrough": isStrikethrough,
 				"underline":     false,
-				"code":          false,
+				"code":          isCode,
 				"color":         "default",
 			},
 		})
@@ -298,20 +301,22 @@ func SortFormattedTexts(texts []FormattedText) []FormattedText {
 	return sortedTexts
 }
 
-func formatMarkdownParagraph(input string) []FormattedText {
+func FormatMarkdownParagraph(input string) []FormattedText {
 	// Indentify all formatable objects
 	boldPattern := regexp.MustCompile(`\*\*(.*?)\*\*`)
 	strikethroughPattern := regexp.MustCompile(`~~(.*?)~~`)
 	linkPattern := regexp.MustCompile(`\[([^\n]+)\]\(([^\n]+)\)`)
 	italicsPattern := regexp.MustCompile(`\*(.*?)\*`)
+	codePattern := regexp.MustCompile("`(.*?)`")
 
 	boldMatches := boldPattern.FindAllStringSubmatchIndex(input, -1)
+	codeMatches := codePattern.FindAllStringSubmatchIndex(input, -1)
 	strikethroughMatches := strikethroughPattern.FindAllStringSubmatchIndex(input, -1)
 	linkMatches := linkPattern.FindAllStringSubmatchIndex(input, -1)
 	rawItalicMatches := italicsPattern.FindAllStringSubmatchIndex(input, -1)
 	italicMatches := [][]int{}
 
-	cummulativeLength := len(boldMatches) + len(strikethroughMatches) + len(linkMatches) + len(italicMatches)
+	cummulativeLength := len(boldMatches) + len(strikethroughMatches) + len(linkMatches) + len(italicMatches) + len(codeMatches)
 
 	if cummulativeLength == 0 {
 		return []FormattedText{
@@ -347,6 +352,15 @@ func formatMarkdownParagraph(input string) []FormattedText {
 			End:    sMatch[1],
 			Text:   input[sMatch[2]:sMatch[3]],
 			Format: "S",
+		})
+	}
+
+	for _, cMatch := range codeMatches {
+		corpus = append(corpus, FormattedText{
+			Index:  cMatch[0],
+			End:    cMatch[1],
+			Text:   input[cMatch[2]:cMatch[3]],
+			Format: "C",
 		})
 	}
 
