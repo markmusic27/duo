@@ -304,16 +304,22 @@ func SortFormattedTexts(texts []FormattedText) []FormattedText {
 func FormatMarkdownParagraph(input string) []FormattedText {
 	// Indentify all formatable objects
 	boldPattern := regexp.MustCompile(`\*\*(.*?)\*\*`)
+	boldUnderscoreVariantPattern := regexp.MustCompile(`__(.*?)__`)
 	strikethroughPattern := regexp.MustCompile(`~~(.*?)~~`)
 	linkPattern := regexp.MustCompile(`\[([^\n]+)\]\(([^\n]+)\)`)
 	italicsPattern := regexp.MustCompile(`\*(.*?)\*`)
+	italicsUnderscoreVariantPattern := regexp.MustCompile(`_(.*?)_`)
+
 	codePattern := regexp.MustCompile("`(.*?)`")
 
 	boldMatches := boldPattern.FindAllStringSubmatchIndex(input, -1)
+	boldMatches = append(boldMatches, boldUnderscoreVariantPattern.FindAllStringSubmatchIndex(input, -1)...)
+
 	codeMatches := codePattern.FindAllStringSubmatchIndex(input, -1)
 	strikethroughMatches := strikethroughPattern.FindAllStringSubmatchIndex(input, -1)
 	linkMatches := linkPattern.FindAllStringSubmatchIndex(input, -1)
 	rawItalicMatches := italicsPattern.FindAllStringSubmatchIndex(input, -1)
+	rawItalicMatches = append(rawItalicMatches, italicsUnderscoreVariantPattern.FindAllStringSubmatchIndex(input, -1)...)
 	italicMatches := [][]int{}
 
 	cummulativeLength := len(boldMatches) + len(strikethroughMatches) + len(linkMatches) + len(italicMatches) + len(codeMatches)
