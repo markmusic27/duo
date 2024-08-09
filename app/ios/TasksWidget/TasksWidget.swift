@@ -166,9 +166,17 @@ struct TasksView: View {
 ]
   
   var body: some View {
-    VStack {
-      TaskView(task: exampleTasks[0])
-      TaskView(task: exampleTasks[1])
+    VStack (spacing: 3) {
+      ForEach(exampleTasks) { task in
+        VStack (spacing: 3) {
+          TaskView(task: task)
+          if task.id != exampleTasks.last?.id {
+            Rectangle()
+              .frame(height: 0.5)
+              .foregroundColor(Color(hex: 0x3E3E40))
+          }
+        }
+      }
     }.padding(.top, 50)
       .padding(.leading, 14)
       .padding(.trailing, 8)
@@ -210,7 +218,7 @@ struct TaskView: View {
         Text(task.title)
           .foregroundColor(.white)
           .font(.system(size: 14, weight: .regular, design: .rounded))
-          .lineLimit(1)
+          .lineLimit(2)
           .truncationMode(.tail)
         DataView(task: task)
       }
