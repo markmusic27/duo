@@ -25,23 +25,12 @@ struct TasksEntry: TimelineEntry {
 
 struct TasksWidgetEntryView: View {
     var entry: Provider.Entry
-  
-  let exampleTasks: [Task] = [
-      Task(title: "Finish differential equations problem set", description: "Pages 12 through 14 in Canvas PDF", dueDate: "Yesterday @ 11:00 PM", priority: 1, isComplete: false),
-      Task(title: "Submit tax documents", description: "Gather and submit all tax-related documents", dueDate: "Tomorrow @ 5:00 PM", priority: 2, isComplete: false),
-      Task(title: "Buy groceries", description: "Milk, Eggs, Bread, and Butter", dueDate: "Today @ 6:00 PM", priority: 3, isComplete: false),
-  ]
 
     var body: some View {
       ZStack(alignment: .top) {
         Color(hex: 0x191919)
+        TasksView()
         NavBar()
-        
-        
-//        Text("tasks...")
-//          .foregroundColor(.white)
-//          .frame(maxWidth: .infinity, maxHeight: .infinity)
-//          .multilineTextAlignment(.center)
       }
       .containerBackground(for: .widget) {
         Color(hex: 0x191919)
@@ -87,13 +76,6 @@ struct TasksWidget: Widget {
     }
 }
 
-struct TasksWidget_Previews: PreviewProvider {
-    static var previews: some View {
-        TasksWidgetEntryView(entry: TasksEntry())
-            .previewContext(WidgetPreviewContext(family: .systemLarge))
-    }
-}
-
 extension Color {
     init(hex: UInt, alpha: Double = 1) {
         self.init(
@@ -112,7 +94,7 @@ struct NavBar: View {
   var body: some View {
     VStack (spacing: 0) {
       ZStack {
-        LinearGradient(gradient: Gradient(colors: [Color(hex: 0xFDD600), Color(hex:0xE09400)]),
+        LinearGradient(gradient: Gradient(colors: [Color(hex: 0x474747), Color(hex:0x303030)]),
                                    startPoint: .top,
                                    endPoint: .bottom).overlay(
                                     Rectangle()
@@ -131,10 +113,10 @@ struct NavBar: View {
               .font(.system(size: 15, weight: .bold, design: .rounded))
           Spacer()
           Image("left-arrow")
-            .foregroundColor(.white.opacity(0.6))
+            .foregroundColor(.white.opacity(0.2))
           Rectangle().frame(width: 10, height: 0)
           Image("right-arrow")
-            .foregroundColor(.white.opacity(0.6))
+            .foregroundColor(.white.opacity(0.2))
         }.padding(.horizontal, 14)
       }.frame(height: 42)
       Rectangle()
@@ -162,4 +144,130 @@ struct Line: Shape {
         path.addLine(to: CGPoint(x: rect.width, y: 0))
         return path
     }
+}
+
+
+struct TasksView: View {
+  let exampleTasks: [Task] = [
+    Task(
+        title: "Task 1",
+        description: "Description 1",
+        dueDate: "2024-08-09T20:23:18.768Z", // Due later today at 6:00 PM
+        priority: 1,
+        isComplete: false
+    ),
+]
+  
+  var body: some View {
+    VStack {
+      TaskView(task: exampleTasks[0])
+    }.padding(.top, 50)
+      .padding(.leading, 14)
+      .padding(.trailing, 8)
+  }
+}
+
+struct TaskView: View {
+  var task: Task
+  
+  let priorityColors: [Color] = [
+    Color(hex: 0xFF645E),
+    Color(hex: 0xFF8F24),
+    Color(hex: 0x4A8CFC),
+    Color(hex: 0x525252),
+  ]
+  
+  func getPrimaryColor() -> Color {
+    if task.priority > 4 || task.priority < 0 {
+      return priorityColors[3]
+    } else {
+      return priorityColors[task.priority - 1]
+    }
+  }
+  
+  var body: some View {
+    HStack (alignment: .top, spacing: 10) {
+      Circle()
+        .fill(getPrimaryColor().opacity(0.15))
+        .frame(width: 20, height: 20)
+        .overlay(
+          Circle()
+            .strokeBorder(getPrimaryColor(), lineWidth: 2.5)
+        )
+        .padding(.top, 3)
+        .onTapGesture {
+          print("Circle button tapped!")
+        }
+      VStack (alignment: .leading, spacing: 2) {
+        Text(task.title)
+          .foregroundColor(.white)
+          .font(.system(size: 14, weight: .regular, design: .rounded))
+          .lineLimit(1)
+          .truncationMode(.tail)
+        DataView(task: task)
+      }
+      Spacer()
+    }.padding(.vertical, 6)
+  }
+}
+
+func extractTime(from iso8601String: String) -> String? {
+  let formatter = ISO8601DateFormatter()
+  formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+  let date = formatter.date(from: iso8601String)
+  
+  if date == nil {
+    return "F"
+  }
+  
+  let currentDate = Date()
+  if currentDate < date! { // Do not show if date has passed (will be handled by overdue)
+    return nil
+  }
+  
+  let cal = Calendar.current
+  let comps = cal.dateComponents([.hour, .minute, .second], from: date!)
+  
+  if (comps.hour == 0 && comps.minute == 0 && comps.second == 0) {
+    return nil // Do not show if time is not included
+  }
+  
+  let dateFormatter = DateFormatter()
+  dateFormatter.dateFormat = "h:mm a"
+  
+  return dateFormatter.string(from: date!)
+}
+
+struct DataView: View {
+  var task: Task
+  
+  private func showTime() -> some View  {
+    
+    if let timeString = extractTime(from: task.dueDate) {
+      return AnyView(HStack (spacing: 4) {
+        Text(timeString)
+          .foregroundColor(Color(hex: 0x98989F))
+          .font(.system(size: 13, weight: .regular, design: .rounded))
+          .lineLimit(1)
+          .truncationMode(.tail)
+        Circle()
+          .fill(Color(hex: 0xCFCFD1))
+          .frame(width: 4, height: 4)
+          .padding(.trailing, 6)
+      })
+    }
+    
+    return AnyView(Rectangle().frame(width: 0, height: 0))
+  }
+  
+  var body: some View {
+    HStack (spacing: 0) {
+      showTime()
+      Text(task.description)
+        .foregroundColor(Color(hex: 0x98989F))
+        .font(.system(size: 13, weight: .regular, design: .rounded))
+        .lineLimit(1)
+        .truncationMode(.tail)
+    }
+  }
 }
