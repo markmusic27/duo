@@ -152,7 +152,14 @@ struct TasksView: View {
     Task(
         title: "Task 1",
         description: "Description 1",
-        dueDate: "2024-08-09T20:23:18.768Z", // Due later today at 6:00 PM
+        dueDate: "2025-08-09T00:00:00.000-6:00", // Later
+        priority: 1,
+        isComplete: false
+    ),
+    Task(
+        title: "Task 2",
+        description: "Description 1",
+        dueDate: "2023-08-08T20:23:18.768Z", // Overdue
         priority: 1,
         isComplete: false
     ),
@@ -161,6 +168,7 @@ struct TasksView: View {
   var body: some View {
     VStack {
       TaskView(task: exampleTasks[0])
+      TaskView(task: exampleTasks[1])
     }.padding(.top, 50)
       .padding(.leading, 14)
       .padding(.trailing, 8)
@@ -211,6 +219,20 @@ struct TaskView: View {
   }
 }
 
+func displayTime(from date: Date) -> String? {
+  let cal = Calendar.current
+  let comps = cal.dateComponents([.hour, .minute, .second], from: date)
+  
+  if (comps.hour == 0 && comps.minute == 0 && comps.second == 0) {
+    return nil // Do not show if time is not included
+  }
+  
+  let dateFormatter = DateFormatter()
+  dateFormatter.dateFormat = "h:mm a"
+  
+  return dateFormatter.string(from: date)
+}
+
 func extractTime(from iso8601String: String) -> String? {
   let formatter = ISO8601DateFormatter()
   formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
@@ -221,21 +243,46 @@ func extractTime(from iso8601String: String) -> String? {
   }
   
   let currentDate = Date()
-  if currentDate < date! { // Do not show if date has passed (will be handled by overdue)
+  if currentDate > date! { // Do not show if date has passed (will be handled by overdue)
     return nil
   }
   
-  let cal = Calendar.current
-  let comps = cal.dateComponents([.hour, .minute, .second], from: date!)
+  return displayTime(from: date!)
+}
+
+func extractOverdue(from iso8601String: String) -> String? {
+  let formatter = ISO8601DateFormatter()
+  formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+  let date = formatter.date(from: iso8601String)
   
-  if (comps.hour == 0 && comps.minute == 0 && comps.second == 0) {
-    return nil // Do not show if time is not included
+  if date == nil {
+    return "F"
   }
   
-  let dateFormatter = DateFormatter()
-  dateFormatter.dateFormat = "h:mm a"
+  let currentDate = Date()
+  if currentDate < date! { // Only show if overdue
+    return nil
+  }
   
-  return dateFormatter.string(from: date!)
+  let t = displayTime(from: date!)
+  
+  if !wasDateYesterday(date!) {
+    // Wasnt yesterday add return
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "MMMM d"
+    
+    if t == nil {
+      return dateFormatter.string(from: date!)
+    }
+    
+    return "\(dateFormatter.string(from: date!)) @ \(t!)"
+  }
+  
+  if t == nil {
+    return "Yesterday"
+  }
+  
+  return "Yesterday @ \(t!)"
 }
 
 struct DataView: View {
@@ -251,7 +298,26 @@ struct DataView: View {
           .lineLimit(1)
           .truncationMode(.tail)
         Circle()
-          .fill(Color(hex: 0xCFCFD1))
+          .fill(Color(hex: 0x3D3D3D))
+          .frame(width: 4, height: 4)
+          .padding(.trailing, 6)
+      })
+    }
+    
+    return AnyView(Rectangle().frame(width: 0, height: 0))
+  }
+  
+  private func showOverdue() -> some View  {
+    
+    if let timeString = extractOverdue(from: task.dueDate) {
+      return AnyView(HStack (spacing: 4) {
+        Text(timeString)
+          .foregroundColor(Color(hex: 0xFF645E))
+          .font(.system(size: 13, weight: .regular, design: .rounded))
+          .lineLimit(1)
+          .truncationMode(.tail)
+        Circle()
+          .fill(Color(hex: 0x3D3D3D))
           .frame(width: 4, height: 4)
           .padding(.trailing, 6)
       })
@@ -262,6 +328,7 @@ struct DataView: View {
   
   var body: some View {
     HStack (spacing: 0) {
+      showOverdue()
       showTime()
       Text(task.description)
         .foregroundColor(Color(hex: 0x98989F))
@@ -270,4 +337,19 @@ struct DataView: View {
         .truncationMode(.tail)
     }
   }
+}
+
+func wasDateYesterday(_ date: Date) -> Bool {
+    let calendar = Calendar.current
+    
+    // Get the current date and time
+    let now = Date()
+    
+    // Calculate the start and end of yesterday
+    let startOfToday = calendar.startOfDay(for: now)
+    let startOfYesterday = calendar.date(byAdding: .day, value: -1, to: startOfToday)!
+    let endOfYesterday = calendar.date(byAdding: .day, value: 1, to: startOfToday)! - 1
+    
+    // Check if the date falls within the start and end of yesterday
+    return date >= startOfYesterday && date <= endOfYesterday
 }
