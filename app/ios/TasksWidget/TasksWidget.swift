@@ -4,23 +4,41 @@ import SwiftUI
 
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> TasksEntry {
-        TasksEntry()
+      TasksEntry(tasks: [])
     }
 
     func getSnapshot(in context: Context, completion: @escaping (TasksEntry) -> ()) {
-        let entry = TasksEntry()
+      let entry = TasksEntry(tasks: [])
         completion(entry)
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<TasksEntry>) -> ()) {
-        let entries = [TasksEntry()]  // Single entry
+      let tasks: [Task] = [
+          Task(
+              title: "Task 1",
+              description: "Description 1",
+              dueDate: "2025-08-09T00:00:00.000-6:00", // Later
+              priority: 1,
+              isComplete: false
+          ),
+          Task(
+              title: "Task 2",
+              description: "Description 1",
+              dueDate: "2023-08-08T20:23:18.768Z", // Overdue
+              priority: 1,
+              isComplete: false
+          ),
+      ]
+      
+      let entries = [TasksEntry(tasks: tasks)]  // Single entry
         let timeline = Timeline(entries: entries, policy: .never)
         completion(timeline)
     }
 }
 
 struct TasksEntry: TimelineEntry {
-    let date = Date()  // Required by TimelineEntry protocol, but not used
+  let date = Date()  // Required by TimelineEntry protocol, but not used
+  let tasks: [Task]
 }
 
 struct TasksWidgetEntryView: View {
@@ -29,7 +47,7 @@ struct TasksWidgetEntryView: View {
     var body: some View {
       ZStack(alignment: .top) {
         Color(hex: 0x191919)
-        TasksView()
+        TasksView(tasks: entry.tasks)
         NavBar()
       }
       .containerBackground(for: .widget) {
@@ -148,32 +166,18 @@ struct Line: Shape {
 
 
 struct TasksView: View {
-  let exampleTasks: [Task] = [
-    Task(
-        title: "Task 1",
-        description: "Description 1",
-        dueDate: "2025-08-09T00:00:00.000-6:00", // Later
-        priority: 1,
-        isComplete: false
-    ),
-    Task(
-        title: "Task 2",
-        description: "Description 1",
-        dueDate: "2023-08-08T20:23:18.768Z", // Overdue
-        priority: 1,
-        isComplete: false
-    ),
-]
+  var tasks: [Task]
   
   var body: some View {
     VStack (spacing: 3) {
-      ForEach(exampleTasks) { task in
+      ForEach(tasks) { task in
         VStack (spacing: 3) {
           TaskView(task: task)
-          if task.id != exampleTasks.last?.id {
+          if task.id != tasks.last?.id {
             Rectangle()
               .frame(height: 0.5)
               .foregroundColor(Color(hex: 0x3E3E40))
+              .padding(.trailing, 6)
           }
         }
       }
