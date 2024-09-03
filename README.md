@@ -1,8 +1,8 @@
 <p align="center">
   <a href="#">
-    <img width="160" height="160" src="https://i.ibb.co/GsGkTys/workspace-ai-icon.png" alt="Logo">
+    <img width="160" height="160" src="https://i.ibb.co/gDCGg1c/Frame-22.png" alt="Logo">
   </a>
-  <h1 align="center"><b>workspace ai</b></h1>
+  <h1 align="center"><b>duo</b></h1>
   <p align="center">
   ✶ An LLM extension of my workspace hosted on Notion ✶
     <br />
