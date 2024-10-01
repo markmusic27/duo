@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -191,26 +192,29 @@ func InboundSMSRequest(c *gin.Context) {
 	if strings.Contains(c.PostForm("Body"), process.TimezonePrefix) {
 		location, err := process.ExtractLocationFromSMS(c.PostForm("Body"))
 		if err != nil {
-			process.Message(c.PostForm("From"), "Error: Failed to extract location from string.\n"+err.Error())
+			process.Log("🚨", "Error", "Failed to extract location from string.\n"+err.Error())
 			return
 		}
 
 		iana, err := process.SetTimezoneFromLocation(location)
 		if err != nil {
-			process.Message(c.PostForm("From"), "Error: "+err.Error())
+			process.Log("🚨", "Error", err.Error())
 			return
 		}
 
-		process.Message(c.PostForm("From"), fmt.Sprintf("Updated timezone to %s", iana+" ✅"))
+		process.Log("⏱️", "Update Timezone to "+iana, "The timezone has been set to "+iana)
+		log.Println(iana)
 		return
 	}
 
 	// Process Message
 	_, err := process.Process(c.PostForm("Body"))
 
+	log.Println(err)
+
 	if err != nil {
-		process.Message(c.PostForm("From"), "Error: "+process.TruncateString(err.Error()))
+		process.Log("🚨", "Error", err.Error())
 	} else {
-		process.Message(c.PostForm("From"), "Logged ✅")
+		process.Log("✅", "Logged", "Sucessfully logged message")
 	}
 }
