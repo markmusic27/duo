@@ -1,7 +1,7 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "workspace-ai",
-  "title": "Workspace AI",
+  "name": "duo",
+  "title": "Duo",
   "description": "A personal AI assistant that catalogs todos and notes in my Notion workspace.",
   "icon": "command-icon.png",
   "author": "mmusic",
@@ -12,7 +12,7 @@
   "commands": [
     {
       "name": "index",
-      "title": "Capture",
+      "title": "Duo",
       "description": "Processes and logs notes and todo items in the Notion Workspace.",
       "mode": "no-view",
       "arguments": [
