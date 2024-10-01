@@ -1,6 +1,6 @@
 <p align="center">
   <a href="#">
-    <img width="160" height="160" src="https://i.ibb.co/gDCGg1c/Frame-22.png" alt="Logo">
+    <img width="130" height="130" src="https://i.ibb.co/gDCGg1c/Frame-22.png" alt="Logo">
   </a>
   <h1 align="center"><b>duo</b></h1>
   <p align="center">
