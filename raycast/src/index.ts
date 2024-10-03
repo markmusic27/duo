@@ -9,6 +9,7 @@ interface CaptureProps {
 interface ResponseData {
   error?: string;
   message?: string;
+  id?: string;
 }
 
 export default async function main(props: LaunchProps<{ arguments: CaptureProps }>) {
@@ -30,13 +31,15 @@ export default async function main(props: LaunchProps<{ arguments: CaptureProps 
       const data = await res.json();
       const responseData = data as ResponseData;
 
-      if (responseData.message == null) {
+      const logged = responseData.id != null && responseData.id != "";
+
+      if (logged && responseData.message == null) {
         await showHUD("✅ Logged");
 
         return;
       }
 
-      await showHUD(responseData.message);
+      await showHUD(responseData.message ?? "nil msg");
       return;
     }
 

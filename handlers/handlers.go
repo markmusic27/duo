@@ -121,18 +121,21 @@ func InboundHTTPRequest(c *gin.Context) {
 		location, err := process.ExtractLocationFromSMS(body.Message)
 		if err != nil {
 			c.JSON(400, gin.H{"error": fmt.Errorf("Error: Failed to extract location from string.\n" + err.Error())})
+			process.Log("🚨", "Error", "Failed to extract location from string.\n"+err.Error())
 			return
 		}
 
 		iana, err := process.SetTimezoneFromLocation(location)
 		if err != nil {
 			c.JSON(400, gin.H{"error": err.Error()})
+			process.Log("🚨", "Error", err.Error())
 			return
 		}
 
 		c.JSON(200, gin.H{
 			"message": fmt.Sprintf("Updated timezone to %s", iana+" ✅"),
 		})
+		process.Log("⏱️", "Updated Timezone", "Timezone set to "+iana)
 		return
 	}
 
@@ -151,17 +154,20 @@ func InboundHTTPRequest(c *gin.Context) {
 	id, err := process.Process(process.RemoveInstruction(body.Message), instruction)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
+		process.Log("🚨", "Error", err.Error())
 		return
 	}
 
 	if len(id) == 0 {
 		c.JSON(400, gin.H{"error": fmt.Errorf("returned ID was empty")})
+		process.Log("🚨", "Error", "Returned ID was empty")
 		return
 	}
 
 	c.JSON(200, gin.H{
 		"id": id,
 	})
+	process.Log("✅", "Logged", "https://www.notion.so/markmusic/"+strings.ReplaceAll(id, "-", ""))
 }
 
 func InboundSMSRequest(c *gin.Context) {
@@ -202,19 +208,19 @@ func InboundSMSRequest(c *gin.Context) {
 			return
 		}
 
-		process.Log("⏱️", "Update Timezone to "+iana, "The timezone has been set to "+iana)
+		process.Log("⏱️", "Updated Timezone", "Timezone set to "+iana)
 		log.Println(iana)
 		return
 	}
 
 	// Process Message
-	_, err := process.Process(c.PostForm("Body"))
+	id, err := process.Process(c.PostForm("Body"))
 
 	log.Println(err)
 
 	if err != nil {
 		process.Log("🚨", "Error", err.Error())
 	} else {
-		process.Log("✅", "Logged", "Sucessfully logged message")
+		process.Log("✅", "Logged", "https://www.notion.so/markmusic/"+strings.ReplaceAll(id, "-", ""))
 	}
 }
