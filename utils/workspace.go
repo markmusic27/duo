@@ -230,6 +230,7 @@ type GeneratedNote struct {
 	Description string   `json:"description"`
 	Type        string   `json:"type"`
 	Area        []string `json:"area"`
+	Body        string   `json:"body"`
 	Project     []string `json:"project"`
 }
 
@@ -331,6 +332,14 @@ func IngestNote(note string, instructions ...string) (string, error) {
 		generated.Area = append(generated.Area, os.Getenv("COURSE_PAGE_ID"))
 	}
 
+	body, err := ConvertMarkdownToNotion(generated.Body)
+	if err != nil {
+		return "", nil
+	}
+
+	// Add the sources
+	body = append(body, CreateBookmarksFromURLs(urls)...)
+
 	newNote := Note{
 		Parent: ParentDatabase{
 			Type:       "database_id",
@@ -371,7 +380,7 @@ func IngestNote(note string, instructions ...string) (string, error) {
 				Pages: GeneratePageFromStrings(generated.Project),
 			},
 		},
-		Children: CreateBookmarksFromURLs(urls),
+		Children: body,
 	}
 
 	id, err := CreateNote(newNote)
@@ -385,7 +394,7 @@ func IngestNote(note string, instructions ...string) (string, error) {
 func CreateBookmarksFromURLs(urls []string) []Block {
 	var markdown strings.Builder
 
-	markdown.WriteString("### Resources")
+	markdown.WriteString("### Sources")
 
 	for _, url := range urls {
 		markdown.WriteString(fmt.Sprintf("\n- [%s](%s)", url, url))
