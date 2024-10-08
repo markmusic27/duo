@@ -230,6 +230,7 @@ type GeneratedNote struct {
 	Description string   `json:"description"`
 	Type        string   `json:"type"`
 	Area        []string `json:"area"`
+	Course      []string `json:"course"`
 	Body        string   `json:"body"`
 	Project     []string `json:"project"`
 }
@@ -295,6 +296,26 @@ func IngestNote(note string, instructions ...string) (string, error) {
 	}
 
 	template = strings.ReplaceAll(template, "*PROJECTS*", projectContext)
+
+	// Add Course context
+	courseFilter := &Filter{
+		Property: "Status",
+		Status: &StatusFilter{
+			Equals: "In progress",
+		},
+	}
+	courses, err := FetchCourses(courseFilter)
+
+	if err != nil {
+		return "", err
+	}
+
+	courseContext := ""
+	for _, course := range courses {
+		courseContext = courseContext + fmt.Sprintf("\n\t - %s: %s", course.Properties.Name.Title[0].Text, course.ID)
+	}
+
+	template = strings.ReplaceAll(template, "*COURSES*", courseContext)
 
 	// Add area/interest context
 	areasinterests, err := FetchAreasInterests(nil)
@@ -375,6 +396,9 @@ func IngestNote(note string, instructions ...string) (string, error) {
 			},
 			AreaInterest: RelationProp{
 				Pages: GeneratePageFromStrings(generated.Area),
+			},
+			Course: RelationProp{
+				Pages: GeneratePageFromStrings(generated.Course),
 			},
 			Project: RelationProp{
 				Pages: GeneratePageFromStrings(generated.Project),

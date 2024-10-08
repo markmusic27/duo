@@ -275,6 +275,7 @@ type NoteProperties struct {
 	Type         SelectProp    `json:"Type"`
 	AreaInterest RelationProp  `json:"Area / Interest"`
 	Description  RichText      `json:"Description"`
+	Course       RelationProp  `json:"Course"`
 	Project      RelationProp  `json:"Project"`
 }
 
