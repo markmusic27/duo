@@ -17,7 +17,7 @@ func main() {
 		return
 	}
 
-	// Setup API
+	//Setup API
 	api := gin.Default()
 
 	const port = "8080"
@@ -37,4 +37,5 @@ func main() {
 
 	log.Println("Starting server on port " + port)
 	api.Run(":" + port)
+
 }

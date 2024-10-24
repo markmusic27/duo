@@ -2,6 +2,7 @@ package process
 
 import ( // hola - dr. izuz ♡ 07/10/24
 	"fmt"
+	"log"
 )
 
 func Ingest(message string, instructions ...string) (string, error) {
@@ -44,10 +45,25 @@ func Process(message string, instructions ...string) (string, error) {
 		instruction = instructions[0]
 	}
 
-	id, err := Ingest(message, instruction)
-	if err != nil && len(id) == 0 {
-		// Retry once
+	var id string
+	var err error
+	maxRetries := 4
+
+	for attempt := 1; attempt <= maxRetries; attempt++ {
 		id, err = Ingest(message, instruction)
+
+		log.Println(id, err)
+		if err == nil || len(id) > 0 {
+			break
+		}
+		if attempt < maxRetries {
+			Log("⚠️", fmt.Sprintf("Retry Attempt %d", attempt), "Retrying...")
+		}
 	}
+
+	if err != nil && len(id) == 0 {
+		err = fmt.Errorf("failed after %d attempts: %w", maxRetries, err)
+	}
+
 	return id, err
 }
